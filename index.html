@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base target="_self">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disaster Alert Nepal</title>
+    <meta name="description" content="School-level informational website about disaster awareness and alerts in Nepal">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#3b82f6",
+                        danger: "#ef4444",
+                        warning: "#f59e0b",
+                        safe: "#10b981",
+                        darkbg: "#0f172a",
+                        darkcard: "#1e293b",
+                        darktext: "#e2e8f0"
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        .tab-button.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-900 text-gray-100 font-sans dark">
+    <!-- Header -->
+    <header class="bg-gray-800 shadow-lg">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0">
+                    <h1 class="text-3xl font-bold text-white">Disaster Alert Nepal</h1>
+                    <p class="text-gray-400 mt-1">School Informational Website</p>
+                </div>
+                <div class="bg-blue-900 px-4 py-2 rounded-lg border border-blue-700">
+                    <p class="text-sm text-blue-200">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        Awareness Saves Lives
+                    </p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="bg-gray-800 border-b border-gray-700">
+        <div class="container mx-auto">
+            <div class="flex flex-wrap">
+                <button class="tab-button active px-6 py-4 font-medium text-gray-300 hover:bg-gray-700 transition-colors" data-tab="home">
+                    <i class="fas fa-home mr-2"></i>Home
+                </button>
+                <button class="tab-button px-6 py-4 font-medium text-gray-300 hover:bg-gray-700 transition-colors" data-tab="mapping">
+                    <i class="fas fa-map mr-2"></i>Disaster Mapping
+                </button>
+                <button class="tab-button px-6 py-4 font-medium text-gray-300 hover:bg-gray-700 transition-colors" data-tab="situation">
+                    <i class="fas fa-exclamation-circle mr-2"></i>Current Situation
+                </button>
+                <button class="tab-button px-6 py-4 font-medium text-gray-300 hover:bg-gray-700 transition-colors" data-tab="services">
+                    <i class="fas fa-phone-alt mr-2"></i>Emergency Services
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-8">
+        
+        <!-- Home Tab -->
+        <div id="home" class="tab-content active">
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-700">
+                    <h2 class="text-2xl font-bold text-white mb-6 border-b border-gray-700 pb-3">Understanding Disaster Risks in Nepal</h2>
+                    
+                    <div class="space-y-4 text-gray-300 leading-relaxed">
+                        <p>Natural disasters in Nepal occur unexpectedly and can cause severe damage to communities. The country's diverse geography makes it vulnerable to various hazards that threaten lives and property.</p>
+                        
+                        <p>Nepal frequently experiences earthquakes due to its location on major fault lines. These seismic events can destroy buildings, infrastructure, and result in significant loss of life.</p>
+                        
+                        <p>During monsoon season, heavy rainfall causes flooding in the Terai region and landslides in hilly areas. Floods damage crops, homes, and disrupt transportation networks across affected districts.</p>
+                        
+                        <p>Landslides are common in mountainous regions, blocking roads, burying settlements, and cutting off remote communities from essential services and emergency assistance.</p>
+                        
+                        <p>The impact of these disasters extends beyond immediate damage, affecting livelihoods, education, and long-term development. Many families lose their homes and sources of income.</p>
+                        
+                        <p>Early warning systems and public awareness are crucial for reducing disaster risks. Timely alerts allow communities to prepare, evacuate if necessary, and minimize casualties.</p>
+                        
+                        <p>This website provides basic information about disaster risks in Nepal. Understanding these hazards is the first step toward building safer, more resilient communities.</p>
+                        
+                        <p>Remember: Preparedness saves lives. Stay informed, have an emergency plan, and know evacuation routes for your area.</p>
+                    </div>
+                    
+                    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-red-900 bg-opacity-30 p-5 rounded-lg border border-red-800">
+                            <div class="flex items-center mb-3">
+                                <div class="bg-red-800 p-3 rounded-full mr-3">
+                                    <i class="fas fa-mountain text-red-300 text-xl"></i>
+                                </div>
+                                <h3 class="font-bold text-white">Earthquakes</h3>
+                            </div>
+                            <p class="text-gray-300 text-sm">Nepal lies on active seismic zones with frequent earthquake activity.</p>
+                        </div>
+                        
+                        <div class="bg-blue-900 bg-opacity-30 p-5 rounded-lg border border-blue-800">
+                            <div class="flex items-center mb-3">
+                                <div class="bg-blue-800 p-3 rounded-full mr-3">
+                                    <i class="fas fa-water text-blue-300 text-xl"></i>
+                                </div>
+                                <h3 class="font-bold text-white">Floods</h3>
+                            </div>
+                            <p class="text-gray-300 text-sm">Terai region faces annual flooding during monsoon season.</p>
+                        </div>
+                        
+                        <div class="bg-yellow-900 bg-opacity-30 p-5 rounded-lg border border-yellow-800">
+                            <div class="flex items-center mb-3">
+                                <div class="bg-yellow-800 p-3 rounded-full mr-3">
+                                    <i class="fas fa-layer-group text-yellow-300 text-xl"></i>
+                                </div>
+                                <h3 class="font-bold text-white">Landslides</h3>
+                            </div>
+                            <p class="text-gray-300 text-sm">Hilly areas experience landslides, especially after heavy rain.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Disaster Mapping Tab -->
+        <div id="mapping" class="tab-content">
+            <div class="max-w-6xl mx-auto">
+                <div class="bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-700">
+                    <h2 class="text-2xl font-bold text-white mb-6 border-b border-gray-700 pb-3">Disaster Risk Map of Nepal</h2>
+                    
+                    <div class="mb-6">
+                        <p class="text-gray-300 mb-4">This map shows Nepal's administrative divisions with all 77 districts and 7 provinces. The map provides a geographic reference for understanding disaster-prone areas across the country.</p>
+                        <div class="bg-blue-900 bg-opacity-30 p-4 rounded-lg border border-blue-800">
+                            <p class="text-sm text-blue-200">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                For detailed risk assessment of specific areas, consult official sources from the Government of Nepal.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Map Container -->
+                    <div class="border-2 border-gray-700 rounded-lg overflow-hidden mb-8 bg-gray-900">
+                        <div class="bg-gray-800 p-4 border-b border-gray-700">
+                            <div class="flex justify-between items-center">
+                                <h3 class="font-bold text-white">Nepal Administrative Map</h3>
+                                <div class="text-sm text-gray-400">
+                                    <i class="fas fa-map mr-1"></i>
+                                    Showing 7 Provinces & 77 Districts
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Nepal Map Container -->
+                        <div class="relative bg-gray-900 p-4">
+                            <!-- Nepal Map Base -->
+                            <div class="relative w-full h-[500px] overflow-hidden rounded-lg border border-gray-700 bg-gray-800">
+                                <!-- Actual Nepal Map Image -->
+                                <img 
+                                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/New_Map_of_Nepal_District_and_Province.svg/1280px-New_Map_of_Nepal_District_and_Province.svg.png" 
+                                    alt="Detailed map of Nepal showing all 77 districts and 7 provinces with clear boundaries and labels"
+                                    class="w-full h-full object-contain"
+                                    id="nepal-map-image"
+                                />
+                            </div>
+                            
+                            <!-- Map Legend (overlay) -->
+                            <div class="absolute bottom-4 right-4 bg-gray-800 bg-opacity-95 p-4 rounded-lg shadow-xl border border-gray-700 max-w-xs backdrop-blur-sm">
+                                <h4 class="font-bold text-white mb-3 text-sm">Map Information</h4>
+                                <div class="space-y-2">
+                                    <div class="flex items-center">
+                                        <div class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center mr-3">
+                                            <i class="fas fa-bolt text-white text-xs"></i>
+                                        </div>
+                                        <span class="text-sm text-gray-300">Earthquake Prone Area</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mr-3">
+                                            <i class="fas fa-water text-white text-xs"></i>
+                                        </div>
+                                        <span class="text-sm text-gray-300">Flood Prone Area</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center mr-3">
+                                            <i class="fas fa-layer-group text-white text-xs"></i>
+                                        </div>
+                                        <span class="text-sm text-gray-300">Landslide Prone Area</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <div class="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center mr-3">
+                                            <i class="fas fa-fire text-white text-xs"></i>
+                                        </div>
+                                        <span class="text-sm text-gray-300">Forest Fire Prone Area</span>
+                                    </div>
+                                    <div class="mt-3 pt-3 border-t border-gray-700">
+                                        <p class="text-xs text-gray-400">This map shows administrative boundaries only</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-800 p-4 text-sm text-gray-400 border-t border-gray-700">
+                            <p><strong class="text-white">Map Features:</strong></p>
+                            <ul class="list-disc pl-5 mt-2 space-y-1">
+                                <li>All 77 districts clearly labeled with boundaries</li>
+                                <li>7 provinces color-coded for easy identification</li>
+                                <li>Major cities and towns marked</li>
+                                <li>Terrain features shown for geographic reference</li>
+                                <li>Use the legend to understand disaster-prone areas</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+                            <h4 class="font-bold text-white mb-3">Major Disaster Prone Areas</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center p-3 bg-red-900 bg-opacity-20 rounded border border-red-800">
+                                    <i class="fas fa-bolt text-red-400 mr-3"></i>
+                                    <div>
+                                        <span class="text-white">Central Nepal</span>
+                                        <p class="text-gray-400 text-xs">Earthquake prone: Kathmandu Valley, Gorkha, Sindhupalchok</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center p-3 bg-blue-900 bg-opacity-20 rounded border border-blue-800">
+                                    <i class="fas fa-water text-blue-400 mr-3"></i>
+                                    <div>
+                                        <span class="text-white">Terai Region</span>
+                                        <p class="text-gray-400 text-xs">Flood prone: Saptari, Siraha, Rautahat, Bardiya</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center p-3 bg-yellow-900 bg-opacity-20 rounded border border-yellow-800">
+                                    <i class="fas fa-layer-group text-yellow-400 mr-3"></i>
+                                    <div>
+                                        <span class="text-white">Hilly Districts</span>
+                                        <p class="text-gray-400 text-xs">Landslide prone: Sindhuli, Kavrepalanchok, Dolakha</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-800 p-5 rounded-lg border border-gray-700">
+                            <h4 class="font-bold text-white mb-3">Understanding the Map</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center">
+                                    <i class="fas fa-map-marked-alt text-green-400 mr-3"></i>
+                                    <div>
+                                        <span class="text-white">Province Boundaries</span>
+                                        <p class="text-gray-400 text-sm">Thick lines show 7 provincial borders</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-draw-polygon text-purple-400 mr-3"></i>
+                                    <div>
+                                        <span class="text-white">District Boundaries</span>
+                                        <p class="text-gray-400 text-sm">Thin lines show 77 district borders</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-mountain text-blue-400 mr-3"></i>
+                                    <div>
+                                        <span class="text-white">Geographic Features</span>
+                                        <p class="text-gray-400 text-sm">Terrain shading shows elevation changes</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Situation Tab -->
+        <div id="situation" class="tab-content">
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-700">
+                    <h2 class="text-2xl font-bold text-white mb-6 border-b border-gray-700 pb-3">Current Situation - Personalized Alerts</h2>
+                    
+                    <div class="mb-8">
+                        <div class="bg-blue-900 bg-opacity-30 p-4 rounded-lg border border-blue-800 mb-6">
+                            <div class="flex items-center">
+                                <i class="fas fa-info-circle text-blue-300 text-xl mr-3"></i>
+                                <div>
+                                    <p class="text-blue-200 font-medium">Real-time personalized disaster alerts based on your location</p>
+                                    <p class="text-blue-300 text-sm mt-1">Click the button below to get your current location and receive area-specific weather updates and disaster warnings.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center mb-8">
+                            <div class="inline-flex items-center bg-gray-700 px-4 py-2 rounded-full border border-gray-600">
+                                <i class="fas fa-map-marker-alt text-blue-400 mr-2"></i>
+                                <span id="location-status" class="text-gray-300">Get your location for personalized alerts</span>
+                                <button id="get-location-btn" class="ml-4 bg-blue-600 text-white px-4 py-1 rounded text-sm hover:bg-blue-700 transition-colors">
+                                    <i class="fas fa-location-arrow mr-1"></i>Get My Location
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Real-time Data Display -->
+                    <div id="real-time-data" class="space-y-6">
+                        <!-- Weather Info Box -->
+                        <div class="border-l-4 border-blue-500 bg-blue-900 bg-opacity-20 p-5 rounded-r-lg">
+                            <div class="flex items-start">
+                                <div class="bg-blue-800 p-3 rounded-full mr-4">
+                                    <i class="fas fa-cloud-sun text-blue-300 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-white text-lg mb-1">Current Weather</h3>
+                                    <p class="text-gray-300 mb-2" id="weather-info">Click "Get My Location" to see your local weather</p>
+                                    <div class="flex items-center text-sm text-gray-400">
+                                        <i class="far fa-clock mr-2"></i>
+                                        <span id="weather-time">Waiting for data...</span>
+                                        <span class="mx-2">•</span>
+                                        <i class="fas fa-map-marker-alt mr-2"></i>
+                                        <span id="weather-location">Your Location</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Earthquake Alert Box -->
+                        <div class="border-l-4 border-red-500 bg-red-900 bg-opacity-20 p-5 rounded-r-lg">
+                            <div class="flex items-start">
+                                <div class="bg-red-800 p-3 rounded-full mr-4">
+                                    <i class="fas fa-bolt text-red-300 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-white text-lg mb-1">Earthquake Activity</h3>
+                                    <p class="text-gray-300 mb-2" id="earthquake-info">Checking for recent seismic activity...</p>
+                                    <div class="flex items-center text-sm text-gray-400">
+                                        <i class="far fa-clock mr-2"></i>
+                                        <span id="earthquake-time">Last 24 hours</span>
+                                        <span class="mx-2">•</span>
+                                        <i class="fas fa-map-marker-alt mr-2"></i>
+                                        <span id="earthquake-location">Nepal Region</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Flood Risk Box -->
+                        <div class="border-l-4 border-green-500 bg-green-900 bg-opacity-20 p-5 rounded-r-lg">
+                            <div class="flex items-start">
+                                <div class="bg-green-800 p-3 rounded-full mr-4">
+                                    <i class="fas fa-water text-green-300 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-white text-lg mb-1">Flood Risk Assessment</h3>
+                                    <p class="text-gray-300 mb-2" id="flood-info">Analyzing rainfall and river conditions...</p>
+                                    <div class="flex items-center text-sm text-gray-400">
+                                        <i class="far fa-clock mr-2"></i>
+                                        <span id="flood-time">Current conditions</span>
+                                        <span class="mx-2">•</span>
+                                        <i class="fas fa-map-marker-alt mr-2"></i>
+                                        <span id="flood-location">Your Area</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Landslide Risk Box -->
+                        <div class="border-l-4 border-yellow-500 bg-yellow-900 bg-opacity-20 p-5 rounded-r-lg">
+                            <div class="flex items-start">
+                                <div class="bg-yellow-800 p-3 rounded-full mr-4">
+                                    <i class="fas fa-layer-group text-yellow-300 text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-white text-lg mb-1">Landslide Risk Assessment</h3>
+                                    <p class="text-gray-300 mb-2" id="landslide-info">Evaluating terrain and rainfall patterns...</p>
+                                    <div class="flex items-center text-sm text-gray-400">
+                                        <i class="far fa-clock mr-2"></i>
+                                        <span id="landslide-time">Current assessment</span>
+                                        <span class="mx-2">•</span>
+                                        <i class="fas fa-map-marker-alt mr-2"></i>
+                                        <span id="landslide-location">Hilly areas</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-8 p-5 bg-gray-800 rounded-lg border border-gray-700">
+                        <h4 class="font-bold text-white mb-3">Real-time Data Sources</h4>
+                        <ul class="space-y-2 text-gray-300">
+                            <li class="flex items-start">
+                                <i class="fas fa-satellite text-purple-400 mt-1 mr-3"></i>
+                                <span>OpenWeatherMap API - Live weather data and forecasts</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-satellite-dish text-green-400 mt-1 mr-3"></i>
+                                <span>USGS Earthquake API - Real-time seismic activity</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-water text-blue-400 mt-1 mr-3"></i>
+                                <span>DHM Nepal - River level and rainfall data</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-mountain text-yellow-400 mt-1 mr-3"></i>
+                                <span>NDRRMA - Landslide risk assessments</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Emergency Services Tab -->
+        <div id="services" class="tab-content">
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-700">
+                    <h2 class="text-2xl font-bold text-white mb-8 border-b border-gray-700 pb-3">Emergency Services Contact</h2>
+                    <p class="text-gray-300 mb-8 text-center">Click any number to call immediately from your device. These are official emergency numbers for Nepal.</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Police -->
+                        <div class="emergency-card bg-red-900 bg-opacity-30 border border-red-800 rounded-lg p-6 hover:bg-red-900 hover:bg-opacity-50 transition-colors cursor-pointer" data-number="100">
+                            <div class="flex items-center">
+                                <div class="bg-red-800 p-4 rounded-full mr-5">
+                                    <i class="fas fa-shield-alt text-red-300 text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-white text-xl">Police</h3>
+                                    <p class="text-gray-300 mt-1">Emergency response & law enforcement</p>
+                                    <div class="mt-3 flex items-center">
+                                        <i class="fas fa-phone text-red-400 mr-3"></i>
+                                        <span class="text-2xl font-bold text-white">100</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-4 pt-4 border-t border-red-800">
+                                <p class="text-sm text-gray-300">For crimes, accidents, and immediate police assistance</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Fire -->
+                        <div class="emergency-card bg-orange-900 bg-opacity-30 border border-orange-800 rounded-lg p-6 hover:bg-orange-900 hover:bg-opacity-50 transition-colors cursor-pointer" data-number="101">
+                            <div class="flex items-center">
+                                <div class="bg-orange-800 p-4 rounded-full mr-5">
+                                    <i class="fas fa-fire-extinguisher text-orange-300 text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-white text-xl">Fire Department</h3>
+                                    <p class="text-gray-300 mt-1">Fire emergencies & rescue operations</p>
+                                    <div class="mt-3 flex items-center">
+                                        <i class="fas fa-phone text-orange-400 mr-3"></i>
+                                        <span class="text-2xl font-bold text-white">101</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-4 pt-4 border-t border-orange-800">
+                                <p class="text-sm text-gray-300">For fire incidents, gas leaks, and technical rescues</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Ambulance -->
+                        <div class="emergency-card bg-green-900 bg-opacity-30 border border-green-800 rounded-lg p-6 hover:bg-green-900 hover:bg-opacity-50 transition-colors cursor-pointer" data-number="102">
+                            <div class="flex items-center">
+                                <div class="bg-green-800 p-4 rounded-full mr-5">
+                                    <i class="fas fa-ambulance text-green-300 text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-white text-xl">Ambulance</h3>
+                                    <p class="text-gray-300 mt-1">Medical emergencies & patient transport</p>
+                                    <div class="mt-3 flex items-center">
+                                        <i class="fas fa-phone text-green-400 mr-3"></i>
+                                        <span class="text-2xl font-bold text-white">102</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-4 pt-4 border-t border-green-800">
+                                <p class="text-sm text-gray-300">For medical emergencies, accidents, and health crises</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Disaster Helpline -->
+                        <div class="emergency-card bg-blue-900 bg-opacity-30 border border-blue-800 rounded-lg p-6 hover:bg-blue-900 hover:bg-opacity-50 transition-colors cursor-pointer" data-number="1133">
+                            <div class="flex items-center">
+                                <div class="bg-blue-800 p-4 rounded-full mr-5">
+                                    <i class="fas fa-life-ring text-blue-300 text-2xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-white text-xl">Disaster Helpline</h3>
+                                    <p class="text-gray-300 mt-1">Natural disaster emergencies</p>
+                                    <div class="mt-3 flex items-center">
+                                        <i class="fas fa-phone text-blue-400 mr-3"></i>
+                                        <span class="text-2xl font-bold text-white">1133</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-4 pt-4 border-t border-blue-800">
+                                <p class="text-sm text-gray-300">For earthquake, flood, landslide, and disaster reports</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-10 p-5 bg-gray-800 rounded-lg border border-gray-700">
+                        <h4 class="font-bold text-white mb-3">Important Notes</h4>
+                        <ul class="space-y-2 text-gray-300">
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-400 mt-1 mr-3"></i>
+                                <span>These numbers work throughout Nepal</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-400 mt-1 mr-3"></i>
+                                <span>Call only for genuine emergencies</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-400 mt-1 mr-3"></i>
+                                <span>Speak clearly and provide your location</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check-circle text-green-400 mt-1 mr-3"></i>
+                                <span>Follow instructions from emergency operators</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-300 mt-12 border-t border-gray-800">
+        <div class="container mx-auto px-4 py-8">
+            <div class="text-center">
+                <h3 class="text-xl font-bold text-white mb-4">Disaster Alert Nepal</h3>
+                <p class="text-gray-400 mb-6 max-w-2xl mx-auto">A school-level informational website to raise awareness about natural disaster risks and emergency preparedness in Nepal.</p>
+                
+                <div class="flex flex-wrap justify-center gap-6 mb-6">
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fas fa-home mr-2"></i>Home
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fas fa-map mr-2"></i>Mapping
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fas fa-exclamation-circle mr-2"></i>Situation
+                    </a>
+                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
+                        <i class="fas fa-phone-alt mr-2"></i>Emergency
+                    </a>
+                </div>
+                
+                <div class="border-t border-gray-800 pt-6 mt-6">
+                    <p class="text-gray-500 text-sm">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        For educational purposes only. In real emergencies, follow official instructions from Government of Nepal authorities.
+                    </p>
+                    <p class="text-gray-500 text-sm mt-2">
+                        © 2023 Disaster Alert Nepal - School Project
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Tab switching functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded');
+            
+            // Get all tab buttons and content
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            // Function to switch tabs
+            function switchTab(tabId) {
+                console.log('Switching to tab:', tabId);
+                
+                // Remove active class from all buttons and contents
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Add active class to clicked button and corresponding content
+                const activeButton = document.querySelector(`[data-tab="${tabId}"]`);
+                const activeContent = document.getElementById(tabId);
+                
+                if (activeButton) {
+                    activeButton.classList.add('active');
+                }
+                
+                if (activeContent) {
+                    activeContent.classList.add('active');
+                }
+            }
+            
+            // Add click event to tab buttons
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const tabId = this.getAttribute('data-tab');
+                    switchTab(tabId);
+                });
+            });
+            
+            // Emergency contact click functionality
+            const emergencyCards = document.querySelectorAll('.emergency-card');
+            emergencyCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const phoneNumber = this.getAttribute('data-number');
+                    const confirmCall = confirm(`Call emergency number ${phoneNumber}? This will initiate a phone call from your device.`);
+                    
+                    if (confirmCall) {
+                        alert(`In a real mobile device, this would call: ${phoneNumber}\n\nOn desktop, please dial manually: ${phoneNumber}`);
+                    }
+                });
+            });
+            
+            // Update timestamps
+            document.querySelectorAll('.far.fa-clock').forEach(icon => {
+                const span = icon.nextElementSibling;
+                if (span) {
+                    span.innerText = "Updated: " + new Date().toLocaleString();
+                }
+            });
+        });
+        
+        // Location button functionality
+        const locationBtn = document.getElementById('get-location-btn');
+        const locationStatus = document.getElementById('location-status');
+        
+        if (locationBtn) {
+            locationBtn.addEventListener('click', async function() {
+                if (navigator.geolocation) {
+                    locationStatus.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Detecting your location...';
+                    
+                    try {
+                        const position = await getLocation();
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        
+                        locationStatus.innerHTML = `<i class="fas fa-map-marker-alt text-blue-400 mr-2"></i>Location detected! Analyzing risks...`;
+                        
+                        // Fetch all data
+                        const [weatherData, earthquakeData] = await Promise.all([
+                            fetchWeatherData(lat, lon),
+                            fetchEarthquakeData()
+                        ]);
+                        
+                        // Analyze risks based on location and data
+                        const riskAnalysis = analyzeRisks(lat, lon, weatherData, earthquakeData);
+                        
+                        // Update UI with real data
+                        updateCurrentSituationUI(riskAnalysis);
+                        
+                        locationStatus.innerHTML = `<i class="fas fa-map-marker-alt text-green-400 mr-2"></i>Location: ${riskAnalysis.locationName || "Your Area"} - Alerts Updated`;
+                        
+                    } catch (error) {
+                        console.error('Error:', error);
+                        locationStatus.innerHTML = '<i class="fas fa-exclamation-triangle text-yellow-500 mr-2"></i>Location access denied or unavailable';
+                        
+                        // Show generic Nepal data
+                        showGenericNepalData();
+                    }
+                } else {
+                    locationStatus.innerHTML = '<i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>Geolocation not supported by your browser';
+                    showGenericNepalData();
+                }
+            });
+        }
+        
+        // Function to get user location
+        function getLocation() {
+            return new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject, { 
+                    timeout: 10000,
+                    enableHighAccuracy: true 
+                });
+            });
+        }
+        
+        // Function to fetch weather data from OpenWeatherMap
+        async function fetchWeatherData(lat, lon) {
+            const WEATHER_API_KEY = "28a7c25cac84f461665e36f4046075f3";
+            try {
+                const response = await fetch(
+                    `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${WEATHER_API_KEY}`
+                );
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Weather API error:', error);
+                return null;
+            }
+        }
+        
+        // Function to fetch earthquake data from USGS
+        async function fetchEarthquakeData() {
+            try {
+                const response = await fetch(
+                    "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson"
+                );
+                const data = await response.json();
+                
+                // Filter for Nepal region earthquakes (last 24 hours)
+                const nepalQuakes = data.features.filter(q => {
+                    const [lng, lat] = q.geometry.coordinates;
+                    // Nepal coordinates: 26-31°N, 80-89°E
+                    return lat > 26 && lat < 31 && lng > 80 && lng < 89;
+                });
+                
+                return nepalQuakes;
+            } catch (error) {
+                console.error('Earthquake API error:', error);
+                return [];
+            }
+        }
+        
+        // Function to analyze risks based on location and data
+        function analyzeRisks(lat, lon, weatherData, earthquakeData) {
+            const now = new Date();
+            const month = now.getMonth() + 1; // 1-12
+            const hour = now.getHours();
+            
+            // Determine location type based on coordinates
+            let locationType = 'unknown';
+            let locationName = weatherData?.name || "Your Area";
+            let region = "Unknown Region";
+            
+            // Nepal regions based on coordinates
+            if (lat > 27.5 && lat < 30) {
+                if (lon > 83 && lon < 87) {
+                    locationType = 'central_hills';
+                    region = "Central Hill Region";
+                } else if (lon > 87) {
+                    locationType = 'eastern_hills';
+                    region = "Eastern Hill Region";
+                } else {
+                    locationType = 'western_hills';
+                    region = "Western Hill Region";
+                }
+            } else if (lat <= 27.5) {
+                locationType = 'terai';
+                region = "Terai Plains";
+            } else {
+                locationType = 'high_himalayas';
+                region = "Himalayan Region";
+            }
+            
+            // Analyze weather risks
+            let weatherRisks = [];
+            let weatherDescription = "Weather data unavailable";
+            let temperature = "N/A";
+            let humidity = "N/A";
+            let rainIntensity = 0;
+            
+            if (weatherData) {
+                temperature = Math.round(weatherData.main.temp);
+                humidity = weatherData.main.humidity;
+                weatherDescription = weatherData.weather[0].description;
+                
+                // Check for rain
+                if (weatherData.weather[0].main.toLowerCase().includes('rain')) {
+                    weatherRisks.push('rain');
+                    rainIntensity = weatherData.rain ? weatherData.rain['1h'] || 0 : 1;
+                }
+                
+                // Check for thunderstorms
+                if (weatherData.weather[0].main.toLowerCase().includes('thunder')) {
+                    weatherRisks.push('thunderstorm');
+                }
+                
+                // Check for high winds
+                if (weatherData.wind.speed > 20) { // km/h
+                    weatherRisks.push('high_winds');
+                }
+                
+                // Check for extreme temperatures
+                if (temperature > 35) {
+                    weatherRisks.push('heat_wave');
+                } else if (temperature < 5) {
+                    weatherRisks.push('cold_wave');
+                }
+            }
+            
+            // Analyze earthquake risks
+            let earthquakeRisks = [];
+            let recentEarthquake = null;
+            
+            if (earthquakeData.length > 0) {
+                // Get the most recent significant earthquake
+                recentEarthquake = earthquakeData[0];
+                const magnitude = recentEarthquake.properties.mag;
+                
+                if (magnitude >= 5.0) {
+                    earthquakeRisks.push('significant_earthquake');
+                } else if (magnitude >= 4.0) {
+                    earthquakeRisks.push('minor_earthquake');
+                }
+            }
+            
+            // Analyze flood risks (based on season, location, and rainfall)
+            let floodRisks = [];
+            if (locationType === 'terai') {
+                // Terai is flood-prone, especially during monsoon
+                if (month >= 6 && month <= 9) { // Monsoon season
+                    floodRisks.push('monsoon_flood_risk');
+                }
+                if (rainIntensity > 10) { // Heavy rainfall
+                    floodRisks.push('heavy_rain_flood');
+                }
+            }
+            
+            // Analyze landslide risks (based on location, rainfall, and terrain)
+            let landslideRisks = [];
+            if (locationType.includes('hills') || locationType.includes('himalayas')) {
+                if (rainIntensity > 5) {
+                    landslideRisks.push('rain_induced_landslide');
+                }
+                if (earthquakeRisks.includes('significant_earthquake')) {
+                    landslideRisks.push('quake_induced_landslide');
+                }
+            }
+            
+            // Analyze forest fire risks
+            let fireRisks = [];
+            if (month >= 2 && month <= 5) { // Dry season
+                if (temperature > 30 && humidity < 30) {
+                    fireRisks.push('forest_fire_risk');
+                }
+            }
+            
+            return {
+                locationName,
+                region,
+                locationType,
+                weather: {
+                    description: weatherDescription,
+                    temperature,
+                    humidity,
+                    risks: weatherRisks,
+                    rainIntensity
+                },
+                earthquakes: {
+                    recent: recentEarthquake,
+                    risks: earthquakeRisks,
+                    count: earthquakeData.length
+                },
+                floods: {
+                    risks: floodRisks
+                },
+                landslides: {
+                    risks: landslideRisks
+                },
+                fires: {
+                    risks: fireRisks
+                },
+                timestamp: now.toLocaleString()
+            };
+        }
+        
+        // Function to update UI with real data
+        function updateCurrentSituationUI(analysis) {
+            const now = new Date();
+            
+            // Update weather info
+            document.getElementById('weather-info').textContent = 
+                `${analysis.weather.description}, ${analysis.weather.temperature}°C, Humidity: ${analysis.weather.humidity}%`;
+            document.getElementById('weather-time').textContent = analysis.timestamp;
+            document.getElementById('weather-location').textContent = analysis.locationName;
+            
+            // Update earthquake info
+            if (analysis.earthquakes.recent) {
+                const eq = analysis.earthquakes.recent;
+                const mag = eq.properties.mag;
+                const place = eq.properties.place;
+                const time = new Date(eq.properties.time).toLocaleTimeString();
+                
+                document.getElementById('earthquake-info').innerHTML = 
+                    `<span class="text-red-300 font-bold">⚠ Magnitude ${mag} earthquake detected!</span><br>
+                     Location: ${place}<br>
+                     Time: ${time}`;
+                
+                if (mag >= 5.0) {
+                    document.getElementById('earthquake-info').innerHTML += 
+                        '<br><span class="text-yellow-300">Stay alert for aftershocks!</span>';
+                }
+            } else {
+                document.getElementById('earthquake-info').textContent = 
+                    "✅ No significant earthquakes detected in Nepal region (last 24 hours)";
+            }
+            document.getElementById('earthquake-time').textContent = "Last 24 hours";
+            document.getElementById('earthquake-location').textContent = "Nepal Region";
+            
+            // Update flood risk
+            let floodMessage = "✅ Low flood risk in your area";
+            if (analysis.floods.risks.length > 0) {
+                if (analysis.floods.risks.includes('monsoon_flood_risk')) {
+                    floodMessage = "⚠ MONSOON ALERT: High flood risk in Terai region";
+                } else if (analysis.floods.risks.includes('heavy_rain_flood')) {
+                    floodMessage = "⚠ HEAVY RAIN ALERT: Localized flooding possible";
+                }
+            }
+            document.getElementById('flood-info').textContent = floodMessage;
+            document.getElementById('flood-time').textContent = analysis.timestamp;
+            document.getElementById('flood-location').textContent = analysis.region;
+            
+            // Update landslide risk
+            let landslideMessage = "✅ Low landslide risk in your area";
+            if (analysis.landslides.risks.length > 0) {
+                if (analysis.landslides.risks.includes('rain_induced_landslide')) {
+                    landslideMessage = "⚠ RAIN ALERT: Increased landslide risk in hilly areas";
+                } else if (analysis.landslides.risks.includes('quake_induced_landslide')) {
+                    landslideMessage = "⚠ EARTHQUAKE ALERT: Landslide risk elevated";
+                }
+            }
+            document.getElementById('landslide-info').textContent = landslideMessage;
+            document.getElementById('landslide-time').textContent = analysis.timestamp;
+            document.getElementById('landslide-location').textContent = analysis.region;
+            
+            // Update box colors based on risk levels
+            updateBoxColors(analysis);
+        }
+        
+        // Function to update box colors based on risk levels
+        function updateBoxColors(analysis) {
+            // Earthquake box
+            const eqBox = document.querySelector('#real-time-data > div:nth-child(2)');
+            if (analysis.earthquakes.risks.includes('significant_earthquake')) {
+                eqBox.className = eqBox.className.replace('border-blue-500', 'border-red-500');
+                eqBox.className = eqBox.className.replace('bg-blue-900', 'bg-red-900');
+            }
+            
+            // Flood box
+            const floodBox = document.querySelector('#real-time-data > div:nth-child(3)');
+            if (analysis.floods.risks.length > 0) {
+                floodBox.className = floodBox.className.replace('border-green-500', 'border-yellow-500');
+                floodBox.className = floodBox.className.replace('bg-green-900', 'bg-yellow-900');
+            }
+            
+            // Landslide box
+            const landslideBox = document.querySelector('#real-time-data > div:nth-child(4)');
+            if (analysis.landslides.risks.length > 0) {
+                landslideBox.className = landslideBox.className.replace('border-yellow-500', 'border-orange-500');
+                landslideBox.className = landslideBox.className.replace('bg-yellow-900', 'bg-orange-900');
+            }
+        }
+        
+        // Function to show generic Nepal data when location is unavailable
+        function showGenericNepalData() {
+            const now = new Date();
+            
+            // Show generic weather for Kathmandu
+            fetchWeatherData(27.7172, 85.3240).then(weatherData => {
+                if (weatherData) {
+                    document.getElementById('weather-info').textContent = 
+                        `${weatherData.weather[0].description}, ${Math.round(weatherData.main.temp)}°C, Humidity: ${weatherData.main.humidity}%`;
+                    document.getElementById('weather-location').textContent = "Kathmandu, Nepal";
+                }
+            });
+            
+            document.getElementById('weather-time').textContent = now.toLocaleString();
+            document.getElementById('earthquake-info').textContent = "Checking seismic activity for Nepal...";
+            document.getElementById('flood-info').textContent = "Current monsoon status: Active (June-September)";
+            document.getElementById('landslide-info').textContent = "Monitor local weather for hill area warnings";
+        }
+    </script>
+</body>
+</html>
