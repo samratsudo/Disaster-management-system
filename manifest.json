@@ -1,0 +1,10 @@
+{
+  "name": "HazardGuard Nepal",
+  "short_name": "HazardGuard",
+  "description": "Disaster awareness and preparedness platform for Nepal",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f8f5f0",
+  "theme_color": "#8b5a2b",
+  "icons": []
+}
