@@ -4,286 +4,1244 @@
     <base target="_self">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Disaster Alert Nepal</title>
-    <meta name="description" content="School-level informational website about disaster awareness and alerts in Nepal">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>HazardGuard Nepal - Disaster Awareness & Preparedness</title>
+    <meta name="description" content="Disaster awareness and preparedness website for Nepal with real-time alerts and emergency information">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8b5a2b">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        primary: "#3b82f6",
-                        danger: "#ef4444",
-                        warning: "#f59e0b",
-                        safe: "#10b981",
-                        darkbg: "#0f172a",
-                        darkcard: "#1e293b",
-                        darktext: "#e2e8f0"
-                    }
-                }
-            }
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Leaflet CSS for Interactive Map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <!-- Leaflet Control Layers CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-bg: #f8f5f0;
+            --secondary-bg: #f0ebe3;
+            --card-bg: #ffffff;
+            --text-primary: #3c2f2f;
+            --text-secondary: #6b5b4c;
+            --accent-brown: #8b5a2b;
+            --accent-orange: #d2691e;
+            --accent-tan: #d2b48c;
+            --accent-red: #c53030;
+            --accent-green: #38a169;
+            --accent-blue: #3182ce;
+            --accent-purple: #805ad5;
+            --border-color: #d4c9ba;
+            --shadow-light: rgba(139, 90, 43, 0.08);
+            --shadow-medium: rgba(139, 90, 43, 0.15);
+            --aqi-good: #00e400;
+            --aqi-moderate: #ffff00;
+            --aqi-sensitive: #ff7e00;
+            --aqi-unhealthy: #ff0000;
+            --aqi-very-unhealthy: #8f3f97;
+            --aqi-hazardous: #7e0023;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--primary-bg);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .floating-nav {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            padding: 10px 20px;
+            z-index: 1000;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 0;
+            align-items: center;
+        }
+
+        .floating-nav button {
+            padding: 12px 28px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            border-radius: 30px;
+            white-space: nowrap;
+        }
+
+        .floating-nav button:hover {
+            background: rgba(139, 90, 43, 0.1);
+            color: var(--accent-brown);
+        }
+
+        .floating-nav button.active {
+            background: var(--accent-brown);
+            color: white;
+            box-shadow: 0 4px 12px rgba(139, 90, 43, 0.2);
+        }
+
+        .nav-divider {
+            color: rgba(212, 201, 186, 0.5);
+            font-weight: 300;
+            padding: 0 8px;
+        }
+
+        .hero-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(rgba(60, 47, 47, 0.7), rgba(60, 47, 47, 0.7)), 
+                        url('https://img.apmcdn.org/11ad388cf3255bb15b9d6d68ab4c5088c908a0cd/uncropped/c51be6-20120706-flood-cleanup4.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+            padding: 0 20px;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            position: relative;
+            z-index: 2;
+            padding: 40px;
+        }
+
+        .hero-title {
+            font-size: 72px;
+            font-weight: 700;
+            margin-bottom: 32px;
+            color: white;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            letter-spacing: -1px;
+            line-height: 1.1;
+            font-family: 'Bodoni MT', 'Times New Roman', serif;
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            line-height: 1.8;
+            margin-bottom: 48px;
+            color: rgba(255, 255, 255, 0.9);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            font-weight: 400;
+            letter-spacing: 0.2px;
+            text-align: center;
+        }
+
+        .discover-btn {
+            display: inline-block;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            text-decoration: none;
+            padding: 16px 0;
+            position: relative;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .discover-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 12px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: white;
+            transform: scaleX(0.7);
+            transition: transform 0.3s;
+        }
+
+        .discover-btn:hover::after {
+            transform: scaleX(1);
+        }
+
+        main {
+            position: relative;
+            z-index: 1;
+        }
+
         .tab-content {
             display: none;
+            animation: fadeInUp 0.5s ease-out;
         }
+
         .tab-content.active {
             display: block;
-            animation: fadeIn 0.5s ease;
         }
-        .tab-button.active {
-            background-color: #3b82f6;
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        .section-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 48px;
+            margin: 60px auto 40px;
+            box-shadow: 0 8px 32px var(--shadow-light);
+        }
+
+        .section-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 32px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--accent-tan);
+            color: var(--accent-brown);
+            position: relative;
+        }
+
+        .content-text {
+            color: var(--text-secondary);
+            font-size: 16px;
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+
+        .map-wrapper {
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 40px 0;
+            background: var(--card-bg);
+            box-shadow: 0 8px 32px var(--shadow-light);
+        }
+
+        .map-header {
+            background: var(--card-bg);
+            padding: 20px 28px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .map-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .map-controls {
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        .map-btn {
+            padding: 8px 16px;
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .map-btn:hover {
+            background: rgba(139, 90, 43, 0.08);
+            color: var(--text-primary);
+        }
+
+        .map-btn.active {
+            background: var(--accent-brown);
+            color: white;
+            border-color: var(--accent-brown);
+        }
+
+        .map-container {
+            position: relative;
+            padding: 24px;
+        }
+
+        .map-display {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            overflow: hidden;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+        }
+
+        #interactive-map {
+            width: 100%;
+            height: 100%;
+            border-radius: 16px;
+        }
+
+        .alert-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 24px;
+            margin-top: 40px;
+        }
+
+        .alert-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .alert-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 32px var(--shadow-medium);
+        }
+
+        .alert-card.high-risk {
+            border-color: var(--accent-red);
+            background: linear-gradient(135deg, rgba(197, 48, 48, 0.05), rgba(197, 48, 48, 0.02));
+        }
+
+        .alert-card.medium-risk {
+            border-color: var(--accent-orange);
+            background: linear-gradient(135deg, rgba(210, 105, 30, 0.05), rgba(210, 105, 30, 0.02));
+        }
+
+        .alert-card.low-risk {
+            border-color: var(--accent-green);
+            background: linear-gradient(135deg, rgba(56, 161, 105, 0.05), rgba(56, 161, 105, 0.02));
+        }
+
+        .alert-card.normal {
+            border-color: var(--accent-blue);
+            background: linear-gradient(135deg, rgba(49, 130, 206, 0.05), rgba(49, 130, 206, 0.02));
+        }
+
+        .alert-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .alert-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
             color: white;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+
+        .alert-card.high-risk .alert-icon {
+            background: linear-gradient(135deg, var(--accent-red), #e53e3e);
+        }
+
+        .alert-card.medium-risk .alert-icon {
+            background: linear-gradient(135deg, var(--accent-orange), #ed8936);
+        }
+
+        .alert-card.low-risk .alert-icon {
+            background: linear-gradient(135deg, var(--accent-green), #48bb78);
+        }
+
+        .alert-card.normal .alert-icon {
+            background: linear-gradient(135deg, var(--accent-blue), #4299e1);
+        }
+
+        .alert-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .alert-card.high-risk .alert-badge {
+            background: rgba(197, 48, 48, 0.15);
+            color: var(--accent-red);
+        }
+
+        .alert-card.medium-risk .alert-badge {
+            background: rgba(210, 105, 30, 0.15);
+            color: var(--accent-orange);
+        }
+
+        .alert-card.low-risk .alert-badge {
+            background: rgba(56, 161, 105, 0.15);
+            color: var(--accent-green);
+        }
+
+        .alert-card.normal .alert-badge {
+            background: rgba(49, 130, 206, 0.15);
+            color: var(--accent-blue);
+        }
+
+        .alert-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .alert-description {
+            color: var(--text-secondary);
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .alert-actions {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(212, 201, 186, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .alert-click-hint {
+            font-size: 13px;
+            color: var(--accent-brown);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .alert-click-hint i {
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            50% {
+                transform: translateX(5px);
+            }
+        }
+
+        .realtime-widgets {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 30px;
+        }
+
+        .realtime-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.3s;
+        }
+
+        .realtime-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px var(--shadow-medium);
+        }
+
+        .realtime-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .realtime-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent-brown);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .realtime-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-live {
+            background: rgba(56, 161, 105, 0.1);
+            color: var(--accent-green);
+        }
+
+        .status-updating {
+            background: rgba(210, 105, 30, 0.1);
+            color: var(--accent-orange);
+        }
+
+        .realtime-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 10px 0;
+            line-height: 1;
+        }
+
+        .realtime-unit {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-left: 4px;
+        }
+
+        .realtime-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .realtime-source {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+            font-size: 11px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .aqi-indicator {
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, 
+                var(--aqi-good) 0%, 
+                var(--aqi-moderate) 20%, 
+                var(--aqi-sensitive) 40%, 
+                var(--aqi-unhealthy) 60%, 
+                var(--aqi-very-unhealthy) 80%, 
+                var(--aqi-hazardous) 100%);
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .aqi-marker {
+            position: absolute;
+            top: -4px;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border: 2px solid var(--text-primary);
+            border-radius: 50%;
+            transform: translateX(-50%);
+        }
+
+        .flood-level-indicator {
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, 
+                var(--accent-green) 0%, 
+                var(--accent-blue) 33%, 
+                var(--accent-orange) 66%, 
+                var(--accent-red) 100%);
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .flood-marker {
+            position: absolute;
+            top: -4px;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border: 2px solid var(--text-primary);
+            border-radius: 50%;
+            transform: translateX(-50%);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .legend-color {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 12px;
+        }
+
+        .weather-widget-mapping {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 24px;
+            margin-top: 40px;
+            box-shadow: 0 8px 32px var(--shadow-light);
+        }
+
+        .weather-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .weather-location {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .weather-location i {
+            color: var(--accent-brown);
+            font-size: 20px;
+        }
+
+        .weather-location h4 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent-brown);
+        }
+
+        .weather-main {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .weather-temp {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .weather-icon {
+            font-size: 64px;
+            color: var(--accent-blue);
+            animation: floatWeather 3s ease-in-out infinite;
+        }
+
+        @keyframes floatWeather {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .weather-details {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .weather-detail {
+            text-align: center;
+        }
+
+        .weather-detail-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .weather-detail-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .emergency-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-top: 40px;
+        }
+
+        .emergency-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 36px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .emergency-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 16px 48px var(--shadow-medium);
+        }
+
+        .emergency-icon-wrapper {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+
+        .emergency-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .emergency-number i {
+            font-size: 20px;
+        }
+
+        .emergency-number span {
+            font-size: 40px;
+            font-weight: 800;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 32px;
+            margin-top: 40px;
+        }
+
+        .team-member {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 32px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .team-member:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px var(--shadow-medium);
+        }
+
+        .member-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+            font-weight: 600;
+            overflow: hidden;
+            border: 3px solid var(--accent-tan);
+        }
+
+        .member-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center center;
+        }
+
+        footer {
+            padding: 60px 0 40px;
+            border-top: 1px solid var(--border-color);
+            margin-top: 80px;
+            background: var(--secondary-bg);
+            text-align: center;
+        }
+
+        .footer-content h3 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--accent-brown);
+        }
+
+        .footer-content > p {
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 32px;
+        }
+
+        .checklist-container {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 32px;
+            margin-top: 40px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            background: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+        }
+
+        .checklist-item:hover {
+            background: rgba(139, 90, 43, 0.05);
+            border-color: var(--accent-tan);
+        }
+
+        .checklist-item input[type="checkbox"] {
+            margin-right: 16px;
+            width: 20px;
+            height: 20px;
+            accent-color: var(--accent-brown);
+        }
+
+        .location-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .location-btn {
+            padding: 12px 20px;
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+
+        .location-btn.secondary {
+            background: transparent;
+            color: var(--accent-brown);
+            border: 2px solid var(--accent-brown);
+        }
+
+        .location-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .location-btn.secondary:hover {
+            background: rgba(139, 90, 43, 0.05);
+        }
+
+        .refresh-btn {
+            padding: 8px 16px;
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+
+        .refresh-btn:hover {
+            background: var(--accent-brown);
+            transform: translateY(-2px);
+        }
+
+        .refresh-btn.updating {
+            background: var(--accent-orange);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .alert-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            border-radius: 24px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-brown);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: var(--accent-red);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .preparedness-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .preparedness-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(212, 201, 186, 0.3);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .preparedness-list li:last-child {
+            border-bottom: none;
+        }
+
+        .preparedness-list li i {
+            color: var(--accent-green);
+            margin-top: 2px;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 48px;
+            }
+            
+            .hero-subtitle {
+                font-size: 18px;
+                padding: 0 10px;
+            }
+            
+            .floating-nav {
+                padding: 8px 16px;
+                top: 16px;
+                backdrop-filter: blur(25px);
+            }
+            
+            .floating-nav button {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+            
+            .nav-divider {
+                display: none;
+            }
+            
+            .section-card {
+                padding: 28px 20px;
+            }
+            
+            .section-title {
+                font-size: 28px;
+            }
+            
+            .location-buttons {
+                flex-direction: column;
+            }
+            
+            .location-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .map-controls {
+                flex-direction: column;
+            }
+            
+            .map-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .realtime-widgets {
+                grid-template-columns: 1fr;
+            }
+            
+            .alert-cards-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .weather-details {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .weather-temp {
+                font-size: 36px;
+            }
+            
+            .weather-icon {
+                font-size: 48px;
+            }
         }
     </style>
 </head>
-<body class="min-h-screen bg-gray-900 text-gray-100 font-sans dark">
-    <!-- Header -->
-    <header class="bg-gray-800 shadow-lg">
-        <div class="container mx-auto px-4 py-6">
-            <div class="flex flex-col md:flex-row justify-between items-center">
-                <div class="mb-4 md:mb-0">
-                    <h1 class="text-3xl font-bold text-white">Disaster Alert Nepal</h1>
-                    <p class="text-gray-400 mt-1">School Informational Website</p>
-                </div>
-                <div class="bg-blue-900 px-4 py-2 rounded-lg border border-blue-700">
-                    <p class="text-sm text-blue-200">
-                        <i class="fas fa-exclamation-triangle mr-2"></i>
-                        Awareness Saves Lives
-                    </p>
-                </div>
-            </div>
-        </div>
-    </header>
+<body>
+    <!-- Floating Navigation -->
+    <div class="floating-nav">
+        <button class="active" data-tab="home">Home</button>
+        <span class="nav-divider">|</span>
+        <button data-tab="mapping">Mapping</button>
+        <span class="nav-divider">|</span>
+        <button data-tab="disaster-alert">Disaster Alert</button>
+        <span class="nav-divider">|</span>
+        <button data-tab="emergency">Emergency</button>
+        <span class="nav-divider">|</span>
+        <button data-tab="about">About Us</button>
+    </div>
 
-    <!-- Navigation Tabs -->
-    <nav class="bg-gray-800 border-b border-gray-700">
-        <div class="container mx-auto">
-            <div class="flex flex-wrap">
-                <button class="tab-button active px-6 py-4 font-medium text-gray-300 hover:bg-gray-700 transition-colors" data-tab="home">
-                    <i class="fas fa-home mr-2"></i>Home
-                </button>
-                <button class="tab-button px-6 py-4 font-medium text-gray-300 hover:bg-gray-700 transition-colors" data-tab="mapping">
-                    <i class="fas fa-map mr-2"></i>Disaster Mapping
-                </button>
-                <button class="tab-button px-6 py-4 font-medium text-gray-300 hover:bg-gray-700 transition-colors" data-tab="situation">
-                    <i class="fas fa-exclamation-circle mr-2"></i>Current Situation
-                </button>
-                <button class="tab-button px-6 py-4 font-medium text-gray-300 hover:bg-gray-700 transition-colors" data-tab="services">
-                    <i class="fas fa-phone-alt mr-2"></i>Emergency Services
-                </button>
-            </div>
-        </div>
-    </nav>
-
-    <!-- Main Content -->
-    <main class="container mx-auto px-4 py-8">
-        
+    <main>
         <!-- Home Tab -->
         <div id="home" class="tab-content active">
-            <div class="max-w-4xl mx-auto">
-                <div class="bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-700">
-                    <h2 class="text-2xl font-bold text-white mb-6 border-b border-gray-700 pb-3">Understanding Disaster Risks in Nepal</h2>
+            <div class="hero-section">
+                <div class="hero-content">
+                    <h1 class="hero-title">HazardGuard</h1>
+                    <p class="hero-subtitle">
+                        HazardGuard is a disaster awareness and preparedness website that helps people learn about natural hazards like earthquakes, floods, and landslides in Nepal and provides real‑time alerts and emergency contact information to stay safe.
+                    </p>
+                    <button class="discover-btn" data-tab="mapping">Discover</button>
+                </div>
+            </div>
+
+            <div class="container">
+                <div class="section-card">
+                    <h2 class="section-title">Understanding Disaster Risks in Nepal</h2>
                     
-                    <div class="space-y-4 text-gray-300 leading-relaxed">
+                    <div class="content-text">
                         <p>Natural disasters in Nepal occur unexpectedly and can cause severe damage to communities. The country's diverse geography makes it vulnerable to various hazards that threaten lives and property.</p>
-                        
-                        <p>Nepal frequently experiences earthquakes due to its location on major fault lines. These seismic events can destroy buildings, infrastructure, and result in significant loss of life.</p>
-                        
-                        <p>During monsoon season, heavy rainfall causes flooding in the Terai region and landslides in hilly areas. Floods damage crops, homes, and disrupt transportation networks across affected districts.</p>
-                        
-                        <p>Landslides are common in mountainous regions, blocking roads, burying settlements, and cutting off remote communities from essential services and emergency assistance.</p>
-                        
-                        <p>The impact of these disasters extends beyond immediate damage, affecting livelihoods, education, and long-term development. Many families lose their homes and sources of income.</p>
-                        
                         <p>Early warning systems and public awareness are crucial for reducing disaster risks. Timely alerts allow communities to prepare, evacuate if necessary, and minimize casualties.</p>
-                        
-                        <p>This website provides basic information about disaster risks in Nepal. Understanding these hazards is the first step toward building safer, more resilient communities.</p>
-                        
-                        <p>Remember: Preparedness saves lives. Stay informed, have an emergency plan, and know evacuation routes for your area.</p>
                     </div>
                     
-                    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-red-900 bg-opacity-30 p-5 rounded-lg border border-red-800">
-                            <div class="flex items-center mb-3">
-                                <div class="bg-red-800 p-3 rounded-full mr-3">
-                                    <i class="fas fa-mountain text-red-300 text-xl"></i>
-                                </div>
-                                <h3 class="font-bold text-white">Earthquakes</h3>
-                            </div>
-                            <p class="text-gray-300 text-sm">Nepal lies on active seismic zones with frequent earthquake activity.</p>
-                        </div>
+                    <div class="checklist-container">
+                        <h3 style="margin-bottom: 20px; font-size: 22px; color: var(--accent-brown);">
+                            <i class="fas fa-clipboard-check"></i> Quick Preparedness Checklist
+                        </h3>
                         
-                        <div class="bg-blue-900 bg-opacity-30 p-5 rounded-lg border border-blue-800">
-                            <div class="flex items-center mb-3">
-                                <div class="bg-blue-800 p-3 rounded-full mr-3">
-                                    <i class="fas fa-water text-blue-300 text-xl"></i>
-                                </div>
-                                <h3 class="font-bold text-white">Floods</h3>
-                            </div>
-                            <p class="text-gray-300 text-sm">Terai region faces annual flooding during monsoon season.</p>
+                        <div class="checklist-item" data-category="essential">
+                            <input type="checkbox" id="check1">
+                            <label for="check1">Create a family emergency plan with meeting points</label>
                         </div>
-                        
-                        <div class="bg-yellow-900 bg-opacity-30 p-5 rounded-lg border border-yellow-800">
-                            <div class="flex items-center mb-3">
-                                <div class="bg-yellow-800 p-3 rounded-full mr-3">
-                                    <i class="fas fa-layer-group text-yellow-300 text-xl"></i>
-                                </div>
-                                <h3 class="font-bold text-white">Landslides</h3>
-                            </div>
-                            <p class="text-gray-300 text-sm">Hilly areas experience landslides, especially after heavy rain.</p>
+                        <div class="checklist-item" data-category="essential">
+                            <input type="checkbox" id="check2">
+                            <label for="check2">Prepare a 3-day emergency supply kit</label>
+                        </div>
+                        <div class="checklist-item" data-category="essential">
+                            <input type="checkbox" id="check3">
+                            <label for="check3">Know your nearest emergency shelter location</label>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Disaster Mapping Tab -->
+        <!-- Mapping Tab -->
         <div id="mapping" class="tab-content">
-            <div class="max-w-6xl mx-auto">
-                <div class="bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-700">
-                    <h2 class="text-2xl font-bold text-white mb-6 border-b border-gray-700 pb-3">Disaster Risk Map of Nepal</h2>
+            <div class="container">
+                <div class="section-card">
+                    <h2 class="section-title">Nepal Disaster & Environmental Risk Visualization</h2>
                     
-                    <div class="mb-6">
-                        <p class="text-gray-300 mb-4">This map shows Nepal's administrative divisions with all 77 districts and 7 provinces. The map provides a geographic reference for understanding disaster-prone areas across the country.</p>
-                        <div class="bg-blue-900 bg-opacity-30 p-4 rounded-lg border border-blue-800">
-                            <p class="text-sm text-blue-200">
-                                <i class="fas fa-info-circle mr-2"></i>
-                                For detailed risk assessment of specific areas, consult official sources from the Government of Nepal.
-                            </p>
+                    <div class="content-text">
+                        <p>Visual representation of disaster-prone areas across Nepal. Select different layers to see specific risk types. Click on any location marker to see its weather information.</p>
+                    </div>
+                    
+                    <!-- Weather Widget in Mapping Tab -->
+                    <div class="weather-widget-mapping">
+                        <div class="weather-header">
+                            <div class="weather-location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <h4 id="weather-location-name">Kathmandu</h4>
+                            </div>
+                            <div class="weather-time" id="weather-update-time">Updated: --</div>
+                        </div>
+                        <div class="weather-main">
+                            <div>
+                                <div class="weather-temp" id="weather-temp">22°C</div>
+                                <div class="weather-condition" id="weather-condition" style="color: var(--text-secondary); font-size: 16px;">Partly Cloudy</div>
+                            </div>
+                            <div class="weather-icon">
+                                <i class="fas fa-cloud-sun" id="weather-icon"></i>
+                            </div>
+                        </div>
+                        <div class="weather-details">
+                            <div class="weather-detail">
+                                <div class="weather-detail-label">Humidity</div>
+                                <div class="weather-detail-value" id="weather-humidity">65%</div>
+                            </div>
+                            <div class="weather-detail">
+                                <div class="weather-detail-label">Wind Speed</div>
+                                <div class="weather-detail-value" id="weather-wind">8 km/h</div>
+                            </div>
+                            <div class="weather-detail">
+                                <div class="weather-detail-label">Feels Like</div>
+                                <div class="weather-detail-value" id="weather-feels-like">23°C</div>
+                            </div>
                         </div>
                     </div>
                     
-                    <!-- Map Container -->
-                    <div class="border-2 border-gray-700 rounded-lg overflow-hidden mb-8 bg-gray-900">
-                        <div class="bg-gray-800 p-4 border-b border-gray-700">
-                            <div class="flex justify-between items-center">
-                                <h3 class="font-bold text-white">Nepal Administrative Map</h3>
-                                <div class="text-sm text-gray-400">
-                                    <i class="fas fa-map mr-1"></i>
-                                    Showing 7 Provinces & 77 Districts
-                                </div>
+                    <div class="map-wrapper">
+                        <div class="map-header">
+                            <h3>Interactive Risk Map</h3>
+                            <div class="map-controls">
+                                <button class="map-btn active" data-layer="all">
+                                    <i class="fas fa-layer-group"></i> All Risks
+                                </button>
+                                <button class="map-btn" data-layer="earthquake">
+                                    <i class="fas fa-bolt"></i> Earthquakes
+                                </button>
+                                <button class="map-btn" data-layer="flood">
+                                    <i class="fas fa-water"></i> Flood Risk
+                                </button>
+                                <button class="map-btn" data-layer="landslide">
+                                    <i class="fas fa-layer-group"></i> Landslides
+                                </button>
                             </div>
                         </div>
                         
-                        <!-- Nepal Map Container -->
-                        <div class="relative bg-gray-900 p-4">
-                            <!-- Nepal Map Base -->
-                            <div class="relative w-full h-[500px] overflow-hidden rounded-lg border border-gray-700 bg-gray-800">
-                                <!-- Actual Nepal Map Image -->
-                                <img 
-                                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/New_Map_of_Nepal_District_and_Province.svg/1280px-New_Map_of_Nepal_District_and_Province.svg.png" 
-                                    alt="Detailed map of Nepal showing all 77 districts and 7 provinces with clear boundaries and labels"
-                                    class="w-full h-full object-contain"
-                                    id="nepal-map-image"
-                                />
+                        <div class="map-container">
+                            <div id="district-info" style="position: absolute; top: 24px; left: 24px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); padding: 20px; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 16px 48px rgba(0, 0, 0, 0.1); max-width: 300px; z-index: 500; display: none;">
+                                <h4 id="district-name" style="font-size: 16px; margin-bottom: 8px; color: var(--accent-brown);">Select a District</h4>
+                                <p id="district-description" style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">Click on any district to see detailed risk information.</p>
+                                <div id="district-risks"></div>
+                                <p id="district-tips" style="margin-top: 12px; font-style: italic; font-size: 13px; color: var(--text-secondary);"></p>
                             </div>
                             
-                            <!-- Map Legend (overlay) -->
-                            <div class="absolute bottom-4 right-4 bg-gray-800 bg-opacity-95 p-4 rounded-lg shadow-xl border border-gray-700 max-w-xs backdrop-blur-sm">
-                                <h4 class="font-bold text-white mb-3 text-sm">Map Information</h4>
-                                <div class="space-y-2">
-                                    <div class="flex items-center">
-                                        <div class="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center mr-3">
-                                            <i class="fas fa-bolt text-white text-xs"></i>
-                                        </div>
-                                        <span class="text-sm text-gray-300">Earthquake Prone Area</span>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <div class="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center mr-3">
-                                            <i class="fas fa-water text-white text-xs"></i>
-                                        </div>
-                                        <span class="text-sm text-gray-300">Flood Prone Area</span>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <div class="w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center mr-3">
-                                            <i class="fas fa-layer-group text-white text-xs"></i>
-                                        </div>
-                                        <span class="text-sm text-gray-300">Landslide Prone Area</span>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <div class="w-6 h-6 bg-orange-500 rounded-full flex items-center justify-center mr-3">
-                                            <i class="fas fa-fire text-white text-xs"></i>
-                                        </div>
-                                        <span class="text-sm text-gray-300">Forest Fire Prone Area</span>
-                                    </div>
-                                    <div class="mt-3 pt-3 border-t border-gray-700">
-                                        <p class="text-xs text-gray-400">This map shows administrative boundaries only</p>
-                                    </div>
-                                </div>
+                            <div class="map-display">
+                                <div id="interactive-map"></div>
                             </div>
-                        </div>
-                        
-                        <div class="bg-gray-800 p-4 text-sm text-gray-400 border-t border-gray-700">
-                            <p><strong class="text-white">Map Features:</strong></p>
-                            <ul class="list-disc pl-5 mt-2 space-y-1">
-                                <li>All 77 districts clearly labeled with boundaries</li>
-                                <li>7 provinces color-coded for easy identification</li>
-                                <li>Major cities and towns marked</li>
-                                <li>Terrain features shown for geographic reference</li>
-                                <li>Use the legend to understand disaster-prone areas</li>
-                            </ul>
-                        </div>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="bg-gray-800 p-5 rounded-lg border border-gray-700">
-                            <h4 class="font-bold text-white mb-3">Major Disaster Prone Areas</h4>
-                            <div class="space-y-3">
-                                <div class="flex items-center p-3 bg-red-900 bg-opacity-20 rounded border border-red-800">
-                                    <i class="fas fa-bolt text-red-400 mr-3"></i>
-                                    <div>
-                                        <span class="text-white">Central Nepal</span>
-                                        <p class="text-gray-400 text-xs">Earthquake prone: Kathmandu Valley, Gorkha, Sindhupalchok</p>
+                            
+                            <!-- Legend -->
+                            <div class="map-legend" style="position: absolute; bottom: 24px; right: 24px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); padding: 24px; border-radius: 16px; border: 1px solid var(--border-color); box-shadow: 0 16px 48px rgba(0, 0, 0, 0.1); max-width: 280px; z-index: 500;">
+                                <h4 style="font-size: 14px; font-weight: 700; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 0.5px;">Risk Level Legend</h4>
+                                <div class="legend-item" style="display: flex; align-items: center; margin-bottom: 12px;">
+                                    <div class="legend-color" style="background: #ef4444; color: white; font-size: 10px;">
+                                        <i class="fas fa-exclamation-triangle"></i>
                                     </div>
+                                    <span style="font-size: 13px; color: var(--text-secondary);">High Risk</span>
                                 </div>
-                                <div class="flex items-center p-3 bg-blue-900 bg-opacity-20 rounded border border-blue-800">
-                                    <i class="fas fa-water text-blue-400 mr-3"></i>
-                                    <div>
-                                        <span class="text-white">Terai Region</span>
-                                        <p class="text-gray-400 text-xs">Flood prone: Saptari, Siraha, Rautahat, Bardiya</p>
+                                <div class="legend-item" style="display: flex; align-items: center; margin-bottom: 12px;">
+                                    <div class="legend-color" style="background: #f59e0b; color: white; font-size: 10px;">
+                                        <i class="fas fa-exclamation-circle"></i>
                                     </div>
+                                    <span style="font-size: 13px; color: var(--text-secondary);">Medium Risk</span>
                                 </div>
-                                <div class="flex items-center p-3 bg-yellow-900 bg-opacity-20 rounded border border-yellow-800">
-                                    <i class="fas fa-layer-group text-yellow-400 mr-3"></i>
-                                    <div>
-                                        <span class="text-white">Hilly Districts</span>
-                                        <p class="text-gray-400 text-xs">Landslide prone: Sindhuli, Kavrepalanchok, Dolakha</p>
+                                <div class="legend-item" style="display: flex; align-items: center; margin-bottom: 12px;">
+                                    <div class="legend-color" style="background: #10b981; color: white; font-size: 10px;">
+                                        <i class="fas fa-check-circle"></i>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="bg-gray-800 p-5 rounded-lg border border-gray-700">
-                            <h4 class="font-bold text-white mb-3">Understanding the Map</h4>
-                            <div class="space-y-3">
-                                <div class="flex items-center">
-                                    <i class="fas fa-map-marked-alt text-green-400 mr-3"></i>
-                                    <div>
-                                        <span class="text-white">Province Boundaries</span>
-                                        <p class="text-gray-400 text-sm">Thick lines show 7 provincial borders</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center">
-                                    <i class="fas fa-draw-polygon text-purple-400 mr-3"></i>
-                                    <div>
-                                        <span class="text-white">District Boundaries</span>
-                                        <p class="text-gray-400 text-sm">Thin lines show 77 district borders</p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center">
-                                    <i class="fas fa-mountain text-blue-400 mr-3"></i>
-                                    <div>
-                                        <span class="text-white">Geographic Features</span>
-                                        <p class="text-gray-400 text-sm">Terrain shading shows elevation changes</p>
-                                    </div>
+                                    <span style="font-size: 13px; color: var(--text-secondary);">Low Risk</span>
                                 </div>
                             </div>
                         </div>
@@ -292,697 +1250,1126 @@
             </div>
         </div>
 
-        <!-- Current Situation Tab -->
-        <div id="situation" class="tab-content">
-            <div class="max-w-4xl mx-auto">
-                <div class="bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-700">
-                    <h2 class="text-2xl font-bold text-white mb-6 border-b border-gray-700 pb-3">Current Situation - Personalized Alerts</h2>
+        <!-- Disaster Alert Tab -->
+        <div id="disaster-alert" class="tab-content">
+            <div class="container">
+                <div class="section-card">
+                    <h2 class="section-title">Real-time Disaster Alert System</h2>
                     
-                    <div class="mb-8">
-                        <div class="bg-blue-900 bg-opacity-30 p-4 rounded-lg border border-blue-800 mb-6">
-                            <div class="flex items-center">
-                                <i class="fas fa-info-circle text-blue-300 text-xl mr-3"></i>
-                                <div>
-                                    <p class="text-blue-200 font-medium">Real-time personalized disaster alerts based on your location</p>
-                                    <p class="text-blue-300 text-sm mt-1">Click the button below to get your current location and receive area-specific weather updates and disaster warnings.</p>
+                    <div class="content-text">
+                        <p>Get real-time alerts and environmental data for your selected district. Click on any alert card to see specific preparedness actions.</p>
+                    </div>
+                    
+                    <!-- Location Selection -->
+                    <div class="location-section" style="margin-bottom: 40px;">
+                        <div class="location-prompt" style="display: flex; align-items: center; gap: 16px; background: var(--card-bg); padding: 24px; border-radius: 20px; border: 1px solid var(--border-color); flex-wrap: wrap;">
+                            <i class="fas fa-map-marker-alt" style="color: var(--accent-brown); font-size: 24px;"></i>
+                            <span id="location-status" style="color: var(--text-secondary); font-size: 16px; flex: 1;">Select your district or use your current location</span>
+                            
+                            <div class="district-select-wrapper" style="display: flex; align-items: center; gap: 12px; flex: 2; flex-wrap: wrap;">
+                                <div class="location-buttons">
+                                    <button id="get-my-location-btn" class="location-btn">
+                                        <i class="fas fa-location-arrow"></i> Use My Location
+                                    </button>
+                                    
+                                    <button id="show-other-btn" class="location-btn secondary">
+                                        Wanna see other?
+                                    </button>
                                 </div>
-                            </div>
-                        </div>
-                        
-                        <div class="text-center mb-8">
-                            <div class="inline-flex items-center bg-gray-700 px-4 py-2 rounded-full border border-gray-600">
-                                <i class="fas fa-map-marker-alt text-blue-400 mr-2"></i>
-                                <span id="location-status" class="text-gray-300">Get your location for personalized alerts</span>
-                                <button id="get-location-btn" class="ml-4 bg-blue-600 text-white px-4 py-1 rounded text-sm hover:bg-blue-700 transition-colors">
-                                    <i class="fas fa-location-arrow mr-1"></i>Get My Location
+                                
+                                <select id="district-select" style="flex: 1; padding: 12px 16px; background: var(--secondary-bg); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-primary); font-size: 14px; min-width: 200px; margin-top: 12px;">
+                                    <option value="">-- Select Your District --</option>
+                                    <!-- All 77 districts will be populated by JavaScript -->
+                                </select>
+                                
+                                <button id="get-location-btn" style="background: var(--accent-brown); color: white; padding: 12px 24px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s; font-size: 14px; display: flex; align-items: center; gap: 8px; margin-top: 12px;">
+                                    <i class="fas fa-bell"></i> Get Alerts
                                 </button>
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Real-time Data Display -->
-                    <div id="real-time-data" class="space-y-6">
-                        <!-- Weather Info Box -->
-                        <div class="border-l-4 border-blue-500 bg-blue-900 bg-opacity-20 p-5 rounded-r-lg">
-                            <div class="flex items-start">
-                                <div class="bg-blue-800 p-3 rounded-full mr-4">
-                                    <i class="fas fa-cloud-sun text-blue-300 text-xl"></i>
+                    <!-- Real-time Data Widgets -->
+                    <div class="realtime-widgets">
+                        <!-- Air Quality Widget -->
+                        <div class="realtime-card" id="air-quality-widget">
+                            <div class="realtime-header">
+                                <h3 class="realtime-title">
+                                    <i class="fas fa-wind"></i> Air Quality
+                                </h3>
+                                <span class="realtime-status status-live" id="air-quality-status">Live</span>
+                            </div>
+                            <div class="realtime-value">
+                                <span id="air-quality-value">--</span>
+                                <span class="realtime-unit" id="air-quality-unit">AQI</span>
+                            </div>
+                            <div class="aqi-indicator">
+                                <div class="aqi-marker" id="aqi-marker" style="left: 0%;"></div>
+                            </div>
+                            <div class="realtime-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">Status</span>
+                                    <span class="detail-value" id="air-quality-desc">--</span>
                                 </div>
-                                <div>
-                                    <h3 class="font-bold text-white text-lg mb-1">Current Weather</h3>
-                                    <p class="text-gray-300 mb-2" id="weather-info">Click "Get My Location" to see your local weather</p>
-                                    <div class="flex items-center text-sm text-gray-400">
-                                        <i class="far fa-clock mr-2"></i>
-                                        <span id="weather-time">Waiting for data...</span>
-                                        <span class="mx-2">•</span>
-                                        <i class="fas fa-map-marker-alt mr-2"></i>
-                                        <span id="weather-location">Your Location</span>
-                                    </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">PM2.5</span>
+                                    <span class="detail-value" id="air-quality-pm25">-- μg/m³</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Location</span>
+                                    <span class="detail-value" id="air-quality-location">Select District</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Updated</span>
+                                    <span class="detail-value" id="air-quality-time">--</span>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <!-- Earthquake Alert Box -->
-                        <div class="border-l-4 border-red-500 bg-red-900 bg-opacity-20 p-5 rounded-r-lg">
-                            <div class="flex items-start">
-                                <div class="bg-red-800 p-3 rounded-full mr-4">
-                                    <i class="fas fa-bolt text-red-300 text-xl"></i>
-                                </div>
-                                <div>
-                                    <h3 class="font-bold text-white text-lg mb-1">Earthquake Activity</h3>
-                                    <p class="text-gray-300 mb-2" id="earthquake-info">Checking for recent seismic activity...</p>
-                                    <div class="flex items-center text-sm text-gray-400">
-                                        <i class="far fa-clock mr-2"></i>
-                                        <span id="earthquake-time">Last 24 hours</span>
-                                        <span class="mx-2">•</span>
-                                        <i class="fas fa-map-marker-alt mr-2"></i>
-                                        <span id="earthquake-location">Nepal Region</span>
-                                    </div>
-                                </div>
+                            <div class="realtime-source">
+                                <i class="fas fa-database"></i>
+                                Data Source: Department of Environment, Nepal (pollution.gov.np)
                             </div>
                         </div>
-                        
-                        <!-- Flood Risk Box -->
-                        <div class="border-l-4 border-green-500 bg-green-900 bg-opacity-20 p-5 rounded-r-lg">
-                            <div class="flex items-start">
-                                <div class="bg-green-800 p-3 rounded-full mr-4">
-                                    <i class="fas fa-water text-green-300 text-xl"></i>
+
+                        <!-- Flood Alert Widget -->
+                        <div class="realtime-card" id="flood-alert-widget">
+                            <div class="realtime-header">
+                                <h3 class="realtime-title">
+                                    <i class="fas fa-water"></i> Flood Alert
+                                </h3>
+                                <span class="realtime-status status-live" id="flood-alert-status">Live</span>
+                            </div>
+                            <div class="realtime-value">
+                                <span id="flood-level-value">--</span>
+                                <span class="realtime-unit" id="flood-level-unit">m</span>
+                            </div>
+                            <div class="flood-level-indicator">
+                                <div class="flood-marker" id="flood-marker" style="left: 0%;"></div>
+                            </div>
+                            <div class="realtime-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">Status</span>
+                                    <span class="detail-value" id="flood-alert-desc">--</span>
                                 </div>
-                                <div>
-                                    <h3 class="font-bold text-white text-lg mb-1">Flood Risk Assessment</h3>
-                                    <p class="text-gray-300 mb-2" id="flood-info">Analyzing rainfall and river conditions...</p>
-                                    <div class="flex items-center text-sm text-gray-400">
-                                        <i class="far fa-clock mr-2"></i>
-                                        <span id="flood-time">Current conditions</span>
-                                        <span class="mx-2">•</span>
-                                        <i class="fas fa-map-marker-alt mr-2"></i>
-                                        <span id="flood-location">Your Area</span>
-                                    </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">River</span>
+                                    <span class="detail-value" id="flood-river">--</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Danger Level</span>
+                                    <span class="detail-value" id="flood-danger-level">-- m</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Updated</span>
+                                    <span class="detail-value" id="flood-alert-time">--</span>
                                 </div>
                             </div>
-                        </div>
-                        
-                        <!-- Landslide Risk Box -->
-                        <div class="border-l-4 border-yellow-500 bg-yellow-900 bg-opacity-20 p-5 rounded-r-lg">
-                            <div class="flex items-start">
-                                <div class="bg-yellow-800 p-3 rounded-full mr-4">
-                                    <i class="fas fa-layer-group text-yellow-300 text-xl"></i>
-                                </div>
-                                <div>
-                                    <h3 class="font-bold text-white text-lg mb-1">Landslide Risk Assessment</h3>
-                                    <p class="text-gray-300 mb-2" id="landslide-info">Evaluating terrain and rainfall patterns...</p>
-                                    <div class="flex items-center text-sm text-gray-400">
-                                        <i class="far fa-clock mr-2"></i>
-                                        <span id="landslide-time">Current assessment</span>
-                                        <span class="mx-2">•</span>
-                                        <i class="fas fa-map-marker-alt mr-2"></i>
-                                        <span id="landslide-location">Hilly areas</span>
-                                    </div>
-                                </div>
+                            <div class="realtime-source">
+                                <i class="fas fa-database"></i>
+                                Data Source: Department of Hydrology (hydrology.gov.np)
                             </div>
                         </div>
                     </div>
+
+                    <div style="text-align: center; margin: 20px 0;">
+                        <button class="refresh-btn" id="refresh-realtime-data">
+                            <i class="fas fa-sync-alt"></i> Refresh Real-time Data
+                        </button>
+                    </div>
                     
-                    <div class="mt-8 p-5 bg-gray-800 rounded-lg border border-gray-700">
-                        <h4 class="font-bold text-white mb-3">Real-time Data Sources</h4>
-                        <ul class="space-y-2 text-gray-300">
-                            <li class="flex items-start">
-                                <i class="fas fa-satellite text-purple-400 mt-1 mr-3"></i>
-                                <span>OpenWeatherMap API - Live weather data and forecasts</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-satellite-dish text-green-400 mt-1 mr-3"></i>
-                                <span>USGS Earthquake API - Real-time seismic activity</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-water text-blue-400 mt-1 mr-3"></i>
-                                <span>DHM Nepal - River level and rainfall data</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-mountain text-yellow-400 mt-1 mr-3"></i>
-                                <span>NDRRMA - Landslide risk assessments</span>
-                            </li>
-                        </ul>
+                    <!-- Disaster Alert Cards -->
+                    <div class="alert-cards-container" id="alert-cards-container">
+                        <!-- Alert cards will be generated by JavaScript based on district -->
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Emergency Services Tab -->
-        <div id="services" class="tab-content">
-            <div class="max-w-4xl mx-auto">
-                <div class="bg-gray-800 rounded-lg shadow-lg p-8 border border-gray-700">
-                    <h2 class="text-2xl font-bold text-white mb-8 border-b border-gray-700 pb-3">Emergency Services Contact</h2>
-                    <p class="text-gray-300 mb-8 text-center">Click any number to call immediately from your device. These are official emergency numbers for Nepal.</p>
+        <!-- Emergency Tab -->
+        <div id="emergency" class="tab-content">
+            <div class="container">
+                <div class="section-card">
+                    <h2 class="section-title">Emergency Contacts</h2>
+                    <p style="text-align: center; color: var(--text-secondary); margin-bottom: 40px; font-size: 16px;">
+                        Click any number to call immediately from your device.
+                    </p>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Police -->
-                        <div class="emergency-card bg-red-900 bg-opacity-30 border border-red-800 rounded-lg p-6 hover:bg-red-900 hover:bg-opacity-50 transition-colors cursor-pointer" data-number="100">
-                            <div class="flex items-center">
-                                <div class="bg-red-800 p-4 rounded-full mr-5">
-                                    <i class="fas fa-shield-alt text-red-300 text-2xl"></i>
-                                </div>
-                                <div>
-                                    <h3 class="font-bold text-white text-xl">Police</h3>
-                                    <p class="text-gray-300 mt-1">Emergency response & law enforcement</p>
-                                    <div class="mt-3 flex items-center">
-                                        <i class="fas fa-phone text-red-400 mr-3"></i>
-                                        <span class="text-2xl font-bold text-white">100</span>
-                                    </div>
-                                </div>
+                    <div class="emergency-grid">
+                        <a href="tel:100" class="emergency-card" data-number="100" style="text-decoration: none; color: inherit;">
+                            <div class="emergency-icon-wrapper" style="background: linear-gradient(135deg, rgba(197, 48, 48, 0.15), rgba(197, 48, 48, 0.1)); color: var(--accent-red);">
+                                <i class="fas fa-shield-alt"></i>
                             </div>
-                            <div class="mt-4 pt-4 border-t border-red-800">
-                                <p class="text-sm text-gray-300">For crimes, accidents, and immediate police assistance</p>
+                            <h3>Police</h3>
+                            <p class="subtitle" style="color: var(--text-secondary); font-size: 14px; margin-bottom: 20px;">Emergency response & law enforcement</p>
+                            <div class="emergency-number">
+                                <i class="fas fa-phone"></i>
+                                <span>100</span>
                             </div>
-                        </div>
+                            <div class="emergency-description" style="padding-top: 20px; border-top: 1px solid var(--border-color); font-size: 13px; color: var(--text-secondary);">
+                                For crimes, accidents, and immediate police assistance.
+                            </div>
+                        </a>
                         
-                        <!-- Fire -->
-                        <div class="emergency-card bg-orange-900 bg-opacity-30 border border-orange-800 rounded-lg p-6 hover:bg-orange-900 hover:bg-opacity-50 transition-colors cursor-pointer" data-number="101">
-                            <div class="flex items-center">
-                                <div class="bg-orange-800 p-4 rounded-full mr-5">
-                                    <i class="fas fa-fire-extinguisher text-orange-300 text-2xl"></i>
-                                </div>
-                                <div>
-                                    <h3 class="font-bold text-white text-xl">Fire Department</h3>
-                                    <p class="text-gray-300 mt-1">Fire emergencies & rescue operations</p>
-                                    <div class="mt-3 flex items-center">
-                                        <i class="fas fa-phone text-orange-400 mr-3"></i>
-                                        <span class="text-2xl font-bold text-white">101</span>
-                                    </div>
-                                </div>
+                        <a href="tel:101" class="emergency-card" data-number="101" style="text-decoration: none; color: inherit;">
+                            <div class="emergency-icon-wrapper" style="background: linear-gradient(135deg, rgba(210, 105, 30, 0.15), rgba(210, 105, 30, 0.1)); color: var(--accent-orange);">
+                                <i class="fas fa-fire-extinguisher"></i>
                             </div>
-                            <div class="mt-4 pt-4 border-t border-orange-800">
-                                <p class="text-sm text-gray-300">For fire incidents, gas leaks, and technical rescues</p>
+                            <h3>Fire Department</h3>
+                            <p class="subtitle" style="color: var(--text-secondary); font-size: 14px; margin-bottom: 20px;">Fire emergencies & rescue operations</p>
+                            <div class="emergency-number">
+                                <i class="fas fa-phone"></i>
+                                <span>101</span>
                             </div>
-                        </div>
+                            <div class="emergency-description" style="padding-top: 20px; border-top: 1px solid var(--border-color); font-size: 13px; color: var(--text-secondary);">
+                                For fire incidents, gas leaks, building collapses, and rescues.
+                            </div>
+                        </a>
                         
-                        <!-- Ambulance -->
-                        <div class="emergency-card bg-green-900 bg-opacity-30 border border-green-800 rounded-lg p-6 hover:bg-green-900 hover:bg-opacity-50 transition-colors cursor-pointer" data-number="102">
-                            <div class="flex items-center">
-                                <div class="bg-green-800 p-4 rounded-full mr-5">
-                                    <i class="fas fa-ambulance text-green-300 text-2xl"></i>
-                                </div>
-                                <div>
-                                    <h3 class="font-bold text-white text-xl">Ambulance</h3>
-                                    <p class="text-gray-300 mt-1">Medical emergencies & patient transport</p>
-                                    <div class="mt-3 flex items-center">
-                                        <i class="fas fa-phone text-green-400 mr-3"></i>
-                                        <span class="text-2xl font-bold text-white">102</span>
-                                    </div>
-                                </div>
+                        <a href="tel:102" class="emergency-card" data-number="102" style="text-decoration: none; color: inherit;">
+                            <div class="emergency-icon-wrapper" style="background: linear-gradient(135deg, rgba(56, 161, 105, 0.15), rgba(56, 161, 105, 0.1)); color: var(--accent-green);">
+                                <i class="fas fa-ambulance"></i>
                             </div>
-                            <div class="mt-4 pt-4 border-t border-green-800">
-                                <p class="text-sm text-gray-300">For medical emergencies, accidents, and health crises</p>
+                            <h3>Ambulance</h3>
+                            <p class="subtitle" style="color: var(--text-secondary); font-size: 14px; margin-bottom: 20px;">Medical emergencies & patient transport</p>
+                            <div class="emergency-number">
+                                <i class="fas fa-phone"></i>
+                                <span>102</span>
                             </div>
-                        </div>
+                            <div class="emergency-description" style="padding-top: 20px; border-top: 1px solid var(--border-color); font-size: 13px; color: var(--text-secondary);">
+                                For medical emergencies, accidents, and health crises.
+                            </div>
+                        </a>
                         
-                        <!-- Disaster Helpline -->
-                        <div class="emergency-card bg-blue-900 bg-opacity-30 border border-blue-800 rounded-lg p-6 hover:bg-blue-900 hover:bg-opacity-50 transition-colors cursor-pointer" data-number="1133">
-                            <div class="flex items-center">
-                                <div class="bg-blue-800 p-4 rounded-full mr-5">
-                                    <i class="fas fa-life-ring text-blue-300 text-2xl"></i>
-                                </div>
-                                <div>
-                                    <h3 class="font-bold text-white text-xl">Disaster Helpline</h3>
-                                    <p class="text-gray-300 mt-1">Natural disaster emergencies</p>
-                                    <div class="mt-3 flex items-center">
-                                        <i class="fas fa-phone text-blue-400 mr-3"></i>
-                                        <span class="text-2xl font-bold text-white">1133</span>
-                                    </div>
-                                </div>
+                        <a href="tel:1133" class="emergency-card" data-number="1133" style="text-decoration: none; color: inherit;">
+                            <div class="emergency-icon-wrapper" style="background: linear-gradient(135deg, rgba(49, 130, 206, 0.15), rgba(49, 130, 206, 0.1)); color: var(--accent-blue);">
+                                <i class="fas fa-life-ring"></i>
                             </div>
-                            <div class="mt-4 pt-4 border-t border-blue-800">
-                                <p class="text-sm text-gray-300">For earthquake, flood, landslide, and disaster reports</p>
+                            <h3>Disaster Helpline</h3>
+                            <p class="subtitle" style="color: var(--text-secondary); font-size: 14px; margin-bottom: 20px;">Natural disaster emergencies</p>
+                            <div class="emergency-number">
+                                <i class="fas fa-phone"></i>
+                                <span>1133</span>
                             </div>
-                        </div>
+                            <div class="emergency-description" style="padding-top: 20px; border-top: 1px solid var(--border-color); font-size: 13px; color: var(--text-secondary);">
+                                For earthquake, flood, landslide reports and coordination.
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- About Us Tab -->
+        <div id="about" class="tab-content">
+            <div class="container">
+                <div class="section-card">
+                    <h2 class="section-title">About Us</h2>
+                    
+                    <div class="content-text">
+                        <p>HazardGuard is developed by a dedicated team of students passionate about disaster awareness and community safety in Nepal.</p>
                     </div>
                     
-                    <div class="mt-10 p-5 bg-gray-800 rounded-lg border border-gray-700">
-                        <h4 class="font-bold text-white mb-3">Important Notes</h4>
-                        <ul class="space-y-2 text-gray-300">
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-green-400 mt-1 mr-3"></i>
-                                <span>These numbers work throughout Nepal</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-green-400 mt-1 mr-3"></i>
-                                <span>Call only for genuine emergencies</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-green-400 mt-1 mr-3"></i>
-                                <span>Speak clearly and provide your location</span>
-                            </li>
-                            <li class="flex items-start">
-                                <i class="fas fa-check-circle text-green-400 mt-1 mr-3"></i>
-                                <span>Follow instructions from emergency operators</span>
-                            </li>
-                        </ul>
+                    <div class="team-grid">
+                        <!-- Samrat Singh Dhami as Lead Developer -->
+                        <div class="team-member">
+                            <div class="member-avatar">
+                                <img src="https://scontent.fktm8-1.fna.fbcdn.net/v/t39.30808-6/491916700_552959374501025_1482130836924941837_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=a5f93a&_nc_ohc=ZVzMLN_egjcQ7kNvwHxK_Kt&_nc_oc=AdmNJfOAC7XYBQaery64fkO54h38D2WQIFoMrHgaIlf_2NRsGtfhGzAIeVlbej9KImc&_nc_zt=23&_nc_ht=scontent.fktm8-1.fna&_nc_gid=-s07sZ3oN1VNocACmCEbIg&oh=00_Afu4eOAH1ssQ5B7YsE3VoQn7J3303YFtoU7BofGH8_0IzA&oe=699084E0" 
+                                     alt="Samrat Singh Dhami"
+                                     onerror="this.style.display='none'; this.parentElement.innerHTML='SD'; this.parentElement.style.background='linear-gradient(135deg, var(--accent-brown), var(--accent-orange))';">
+                            </div>
+                            <h3 class="member-name" style="font-size: 20px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">Samrat Singh Dhami</h3>
+                            <div class="member-role" style="color: var(--accent-brown); font-weight: 500; margin-bottom: 16px;">Lead Developer</div>
+                            <p class="member-description" style="color: var(--text-secondary); font-size: 15px; line-height: 1.6;">Lead programmer and architect behind HazardGuard's functionality and data systems.</p>
+                        </div>
+                        
+                        <!-- Aayushman Malla as Presenter -->
+                        <div class="team-member">
+                            <div class="member-avatar">
+                                <img src="https://scontent.fktm8-1.fna.fbcdn.net/v/t39.30808-6/557521216_31614599608184331_6757841387331493315_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=833d8c&_nc_ohc=TDmE_DdcjH0Q7kNvwG2rOMR&_nc_oc=AdmSM08Te81TzZDdi6DlAg6loQw3s18f0huukOmjERUwFHP13QRA4Ub-lx7wINDgLTw&_nc_zt=23&_nc_ht=scontent.fktm8-1.fna&_nc_gid=7i8WKD-H5-JE9jIYQNjNaQ&oh=00_Aft-mm1E9Q_1f1VnkKOD_nIcajURTQvNr75sQPRsSBPq4w&oe=6990ABE2" 
+                                     alt="Aayushman Malla"
+                                     onerror="this.style.display='none'; this.parentElement.innerHTML='AM'; this.parentElement.style.background='linear-gradient(135deg, var(--accent-brown), var(--accent-orange))';">
+                            </div>
+                            <h3 class="member-name" style="font-size: 20px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">Aayushman Malla</h3>
+                            <div class="member-role" style="color: var(--accent-brown); font-weight: 500; margin-bottom: 16px;">Presenter</div>
+                            <p class="member-description" style="color: var(--text-secondary); font-size: 15px; line-height: 1.6;">Presented the project and communicated the vision and functionality to stakeholders.</p>
+                        </div>
+                        
+                        <!-- Digant Gautam as UI/UX Designer -->
+                        <div class="team-member">
+                            <div class="member-avatar">
+                                <img src="https://scontent.fktm20-1.fna.fbcdn.net/v/t39.30808-6/504338220_10238900539512563_4574113430057900343_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=100&ccb=1-7&_nc_sid=833d8c&_nc_ohc=R2e4sYijmicQ7kNvwFEDZK8&_nc_oc=AdlfAF8xhNzsainHQkffvXm-92tWAD18T2ByUh22NBf_82TOlMbOpGBDS9tfEe42qhRB2yXWxfpHRojQRZmsuNAE&_nc_zt=23&_nc_ht=scontent.fktm20-1.fna&_nc_gid=XWlgbEV_6TIiBxWeQwo2IA&oh=00_Afs4yghDOxO4r7LX7nd9WAT974SJZu-YSbaiKVj5yAtUVA&oe=6990FFD4" 
+                                     alt="Digant Gautam"
+                                     onerror="this.style.display='none'; this.parentElement.innerHTML='DG'; this.parentElement.style.background='linear-gradient(135deg, var(--accent-brown), var(--accent-orange))';">
+                            </div>
+                            <h3 class="member-name" style="font-size: 20px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">Digant Gautam</h3>
+                            <div class="member-role" style="color: var(--accent-brown); font-weight: 500; margin-bottom: 16px;">UI/UX Designer</div>
+                            <p class="member-description" style="color: var(--text-secondary); font-size: 15px; line-height: 1.6;">Designed the user interface and experience to ensure intuitive navigation and accessibility.</p>
+                        </div>
+                        
+                        <!-- Siddartha Dahal with new photo -->
+                        <div class="team-member">
+                            <div class="member-avatar">
+                                <img src="https://chatgpt.com/backend-api/estuary/content?id=file_000000000f7c71fa88a183749d9a1872&ts=491870&p=fs&cid=1&sig=067bc3c1f2ebc2ab2563f92410dd1a90696a5fb51603a73fe57cad7ff9d83b27&v=0" 
+                                     alt="Siddartha Dahal"
+                                     onerror="this.style.display='none'; this.parentElement.innerHTML='SD'; this.parentElement.style.background='linear-gradient(135deg, var(--accent-brown), var(--accent-orange))';">
+                            </div>
+                            <h3 class="member-name" style="font-size: 20px; font-weight: 600; margin-bottom: 8px; color: var(--text-primary);">Siddartha Dahal</h3>
+                            <div class="member-role" style="color: var(--accent-brown); font-weight: 500; margin-bottom: 16px;">Sub Helper</div>
+                            <p class="member-description" style="color: var(--text-secondary); font-size: 15px; line-height: 1.6;">Provided research support and assisted with implementation of key features.</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-gray-300 mt-12 border-t border-gray-800">
-        <div class="container mx-auto px-4 py-8">
-            <div class="text-center">
-                <h3 class="text-xl font-bold text-white mb-4">Disaster Alert Nepal</h3>
-                <p class="text-gray-400 mb-6 max-w-2xl mx-auto">A school-level informational website to raise awareness about natural disaster risks and emergency preparedness in Nepal.</p>
-                
-                <div class="flex flex-wrap justify-center gap-6 mb-6">
-                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
-                        <i class="fas fa-home mr-2"></i>Home
-                    </a>
-                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
-                        <i class="fas fa-map mr-2"></i>Mapping
-                    </a>
-                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
-                        <i class="fas fa-exclamation-circle mr-2"></i>Situation
-                    </a>
-                    <a href="#" class="text-gray-400 hover:text-white transition-colors">
-                        <i class="fas fa-phone-alt mr-2"></i>Emergency
-                    </a>
+    <!-- Alert Details Modal -->
+    <div class="alert-modal" id="alert-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-exclamation-triangle" id="modal-icon"></i>
+                    <span id="modal-title">Alert Details</span>
                 </div>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="modal-risk-level" style="margin-bottom: 20px; padding: 8px 16px; border-radius: 20px; display: inline-block; font-size: 14px; font-weight: 600;"></div>
+                <h3 style="margin-bottom: 15px; color: var(--text-primary);" id="modal-alert-title"></h3>
+                <p style="color: var(--text-secondary); margin-bottom: 25px;" id="modal-description"></p>
                 
-                <div class="border-t border-gray-800 pt-6 mt-6">
-                    <p class="text-gray-500 text-sm">
-                        <i class="fas fa-exclamation-triangle mr-2"></i>
-                        For educational purposes only. In real emergencies, follow official instructions from Government of Nepal authorities.
-                    </p>
-                    <p class="text-gray-500 text-sm mt-2">
-                        © 2023 Disaster Alert Nepal - School Project
-                    </p>
+                <h4 style="margin-bottom: 15px; color: var(--accent-brown);"><i class="fas fa-clipboard-list"></i> Preparedness Actions</h4>
+                <ul class="preparedness-list" id="preparedness-list">
+                    <!-- Preparedness items will be added by JavaScript -->
+                </ul>
+                
+                <div style="margin-top: 25px; padding: 15px; background: rgba(212, 201, 186, 0.1); border-radius: 12px;">
+                    <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 10px;"><i class="fas fa-info-circle"></i> <strong>Note:</strong></p>
+                    <p style="color: var(--text-secondary); font-size: 14px;" id="modal-note"></p>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <h3>HazardGuard Nepal</h3>
+                <p>A disaster awareness and preparedness platform designed to enhance community safety through education, real-time information, and emergency resources.</p>
+                <p style="margin-top: 20px; font-size: 14px; color: var(--text-secondary);">
+                    © 2024 HazardGuard | Educational Project | Real-time data from Department of Environment & Department of Hydrology, Nepal
+                </p>
             </div>
         </div>
     </footer>
 
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <!-- Leaflet Control Geocoder for search -->
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+
     <script>
-        // Tab switching functionality
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded');
-            
-            // Get all tab buttons and content
-            const tabButtons = document.querySelectorAll('.tab-button');
+            // Tab switching functionality
+            const tabButtons = document.querySelectorAll('.floating-nav button, .discover-btn');
             const tabContents = document.querySelectorAll('.tab-content');
             
-            // Function to switch tabs
             function switchTab(tabId) {
-                console.log('Switching to tab:', tabId);
-                
-                // Remove active class from all buttons and contents
-                tabButtons.forEach(btn => {
+                // Update floating nav buttons
+                document.querySelectorAll('.floating-nav button').forEach(btn => {
                     btn.classList.remove('active');
+                    if (btn.getAttribute('data-tab') === tabId) {
+                        btn.classList.add('active');
+                    }
                 });
                 
+                // Update tab contents
                 tabContents.forEach(content => {
                     content.classList.remove('active');
+                    if (content.id === tabId) {
+                        content.classList.add('active');
+                    }
                 });
                 
-                // Add active class to clicked button and corresponding content
-                const activeButton = document.querySelector(`[data-tab="${tabId}"]`);
-                const activeContent = document.getElementById(tabId);
-                
-                if (activeButton) {
-                    activeButton.classList.add('active');
+                // Initialize map when mapping tab is opened
+                if (tabId === 'mapping' && window.map === undefined) {
+                    setTimeout(initializeMap, 100);
                 }
                 
-                if (activeContent) {
-                    activeContent.classList.add('active');
-                }
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             }
             
-            // Add click event to tab buttons
-            tabButtons.forEach(button => {
+            // Add click handlers to floating nav buttons
+            document.querySelectorAll('.floating-nav button').forEach(button => {
                 button.addEventListener('click', function(e) {
                     e.preventDefault();
-                    const tabId = this.getAttribute('data-tab');
-                    switchTab(tabId);
+                    switchTab(this.getAttribute('data-tab'));
                 });
             });
             
-            // Emergency contact click functionality
-            const emergencyCards = document.querySelectorAll('.emergency-card');
-            emergencyCards.forEach(card => {
-                card.addEventListener('click', function() {
-                    const phoneNumber = this.getAttribute('data-number');
-                    const confirmCall = confirm(`Call emergency number ${phoneNumber}? This will initiate a phone call from your device.`);
-                    
-                    if (confirmCall) {
-                        alert(`In a real mobile device, this would call: ${phoneNumber}\n\nOn desktop, please dial manually: ${phoneNumber}`);
+            // Discover button handler
+            document.querySelector('.discover-btn').addEventListener('click', function(e) {
+                e.preventDefault();
+                switchTab(this.getAttribute('data-tab'));
+            });
+            
+            // Refresh button
+            const refreshBtn = document.getElementById('refresh-realtime-data');
+            refreshBtn.addEventListener('click', function() {
+                refreshBtn.classList.add('updating');
+                refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+                
+                // Update all real-time data
+                updateAirQualityData();
+                updateFloodAlertData();
+                updateWeatherData();
+                
+                setTimeout(() => {
+                    refreshBtn.classList.remove('updating');
+                    refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Real-time Data';
+                }, 1500);
+            });
+            
+            // Modal functionality
+            const alertModal = document.getElementById('alert-modal');
+            const modalClose = document.getElementById('modal-close');
+            
+            modalClose.addEventListener('click', function() {
+                alertModal.style.display = 'none';
+            });
+            
+            alertModal.addEventListener('click', function(e) {
+                if (e.target === alertModal) {
+                    alertModal.style.display = 'none';
+                }
+            });
+            
+            // Practical preparedness data with realistic tips
+            const preparednessData = {
+                'earthquake': {
+                    high: {
+                        title: 'Earthquake Alert - High Risk',
+                        icon: 'fas fa-bolt',
+                        alertTitle: 'Immediate Action Required',
+                        description: 'Your area is in a high-risk earthquake zone. Major seismic activity is possible.',
+                        riskLevel: 'HIGH RISK',
+                        riskColor: '#ef4444',
+                        preparedness: [
+                            'Store emergency water (4 liters per person per day for 3 days)',
+                            'Secure heavy furniture like cabinets, shelves, and water heaters to walls',
+                            'Prepare "go-bag" with first aid, flashlight, batteries, whistle, and documents',
+                            'Identify safe spots in every room (under sturdy tables, against interior walls)',
+                            'Practice "Drop, Cover, and Hold On" drill with family monthly',
+                            'Know how to shut off gas, water, and electricity mains'
+                        ],
+                        note: 'During shaking: Drop to hands and knees, Cover head under table, Hold on until shaking stops.'
+                    },
+                    medium: {
+                        title: 'Earthquake Alert - Medium Risk',
+                        icon: 'fas fa-bolt',
+                        alertTitle: 'Stay Prepared and Vigilant',
+                        description: 'Your area has moderate earthquake risk. Stay informed and prepared.',
+                        riskLevel: 'MEDIUM RISK',
+                        riskColor: '#f59e0b',
+                        preparedness: [
+                            'Prepare 3-day emergency kit with water, food, medicine, and cash',
+                            'Secure tall furniture that could topple during shaking',
+                            'Have fire extinguishers and know how to use them',
+                            'Create family emergency plan with meeting points',
+                            'Keep shoes and flashlight beside bed for night emergencies',
+                            'Participate in community earthquake drills'
+                        ],
+                        note: 'Check your home for hazards: loose shelves, hanging objects, poor building materials.'
+                    },
+                    low: {
+                        title: 'Earthquake Alert - Low Risk',
+                        icon: 'fas fa-bolt',
+                        alertTitle: 'Maintain Basic Preparedness',
+                        description: 'Your area has low earthquake risk. Maintain basic preparedness.',
+                        riskLevel: 'LOW RISK',
+                        riskColor: '#10b981',
+                        preparedness: [
+                            'Keep basic emergency supplies: water, non-perishable food, first aid',
+                            'Learn basic first aid and CPR techniques',
+                            'Keep emergency contact numbers in phone and wallet',
+                            'Review earthquake safety procedures every 6 months',
+                            'Ensure your home insurance covers earthquake damage',
+                            'Stay informed about seismic activity through official channels'
+                        ],
+                        note: 'While risk is low, earthquakes can occur anywhere without warning.'
                     }
-                });
-            });
-            
-            // Update timestamps
-            document.querySelectorAll('.far.fa-clock').forEach(icon => {
-                const span = icon.nextElementSibling;
-                if (span) {
-                    span.innerText = "Updated: " + new Date().toLocaleString();
-                }
-            });
-        });
-        
-        // Location button functionality
-        const locationBtn = document.getElementById('get-location-btn');
-        const locationStatus = document.getElementById('location-status');
-        
-        if (locationBtn) {
-            locationBtn.addEventListener('click', async function() {
-                if (navigator.geolocation) {
-                    locationStatus.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Detecting your location...';
-                    
-                    try {
-                        const position = await getLocation();
-                        const lat = position.coords.latitude;
-                        const lon = position.coords.longitude;
-                        
-                        locationStatus.innerHTML = `<i class="fas fa-map-marker-alt text-blue-400 mr-2"></i>Location detected! Analyzing risks...`;
-                        
-                        // Fetch all data
-                        const [weatherData, earthquakeData] = await Promise.all([
-                            fetchWeatherData(lat, lon),
-                            fetchEarthquakeData()
-                        ]);
-                        
-                        // Analyze risks based on location and data
-                        const riskAnalysis = analyzeRisks(lat, lon, weatherData, earthquakeData);
-                        
-                        // Update UI with real data
-                        updateCurrentSituationUI(riskAnalysis);
-                        
-                        locationStatus.innerHTML = `<i class="fas fa-map-marker-alt text-green-400 mr-2"></i>Location: ${riskAnalysis.locationName || "Your Area"} - Alerts Updated`;
-                        
-                    } catch (error) {
-                        console.error('Error:', error);
-                        locationStatus.innerHTML = '<i class="fas fa-exclamation-triangle text-yellow-500 mr-2"></i>Location access denied or unavailable';
-                        
-                        // Show generic Nepal data
-                        showGenericNepalData();
+                },
+                'flood': {
+                    high: {
+                        title: 'Flood Alert - High Risk',
+                        icon: 'fas fa-water',
+                        alertTitle: 'Immediate Evacuation May Be Required',
+                        description: 'Your area is at high risk of flooding. River levels are above danger threshold.',
+                        riskLevel: 'HIGH RISK',
+                        riskColor: '#ef4444',
+                        preparedness: [
+                            'Move to higher ground immediately if advised by authorities',
+                            'Prepare emergency bag with medicines, documents, phone charger, cash',
+                            'Turn off electricity, gas, and water mains before evacuating',
+                            'Move valuables and electronics to upper floors',
+                            'Fill bathtubs and containers with clean drinking water',
+                            'Never walk or drive through flood waters (15cm can sweep you away)'
+                        ],
+                        note: 'Stay tuned to local radio for evacuation orders. Do not return until authorities say it\'s safe.'
+                    },
+                    medium: {
+                        title: 'Flood Alert - Medium Risk',
+                        icon: 'fas fa-water',
+                        alertTitle: 'Prepare for Possible Flooding',
+                        description: 'Your area has moderate flood risk. Monitor weather conditions closely.',
+                        riskLevel: 'MEDIUM RISK',
+                        riskColor: '#f59e0b',
+                        preparedness: [
+                            'Prepare sandbags for doorways and low openings',
+                            'Clear gutters, drains, and drainage channels',
+                            'Move important items to higher shelves or upper floors',
+                            'Prepare emergency supplies for 3-5 days',
+                            'Identify safe evacuation routes to higher ground',
+                            'Charge phones and power banks, keep radio batteries ready'
+                        ],
+                        note: 'Monitor river levels during monsoon. Be ready to evacuate if water rises rapidly.'
+                    },
+                    low: {
+                        title: 'Flood Alert - Low Risk',
+                        icon: 'fas fa-water',
+                        alertTitle: 'Monitor Conditions During Monsoon',
+                        description: 'Your area has low flood risk. Stay informed about weather changes.',
+                        riskLevel: 'LOW RISK',
+                        riskColor: '#10b981',
+                        preparedness: [
+                            'Keep drainage systems clear of debris',
+                            'Have emergency contact numbers saved in phone',
+                            'Monitor river levels and weather forecasts during monsoon',
+                            'Prepare basic emergency kit with flashlight, radio, first aid',
+                            'Know location of nearest evacuation shelters',
+                            'Check weather forecasts 2-3 times daily during rainy season'
+                        ],
+                        note: 'Low risk areas can still experience flash floods during heavy rainfall.'
                     }
-                } else {
-                    locationStatus.innerHTML = '<i class="fas fa-exclamation-triangle text-red-500 mr-2"></i>Geolocation not supported by your browser';
-                    showGenericNepalData();
-                }
-            });
-        }
-        
-        // Function to get user location
-        function getLocation() {
-            return new Promise((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(resolve, reject, { 
-                    timeout: 10000,
-                    enableHighAccuracy: true 
-                });
-            });
-        }
-        
-        // Function to fetch weather data from OpenWeatherMap
-        async function fetchWeatherData(lat, lon) {
-            const WEATHER_API_KEY = "28a7c25cac84f461665e36f4046075f3";
-            try {
-                const response = await fetch(
-                    `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${WEATHER_API_KEY}`
-                );
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error('Weather API error:', error);
-                return null;
-            }
-        }
-        
-        // Function to fetch earthquake data from USGS
-        async function fetchEarthquakeData() {
-            try {
-                const response = await fetch(
-                    "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson"
-                );
-                const data = await response.json();
-                
-                // Filter for Nepal region earthquakes (last 24 hours)
-                const nepalQuakes = data.features.filter(q => {
-                    const [lng, lat] = q.geometry.coordinates;
-                    // Nepal coordinates: 26-31°N, 80-89°E
-                    return lat > 26 && lat < 31 && lng > 80 && lng < 89;
-                });
-                
-                return nepalQuakes;
-            } catch (error) {
-                console.error('Earthquake API error:', error);
-                return [];
-            }
-        }
-        
-        // Function to analyze risks based on location and data
-        function analyzeRisks(lat, lon, weatherData, earthquakeData) {
-            const now = new Date();
-            const month = now.getMonth() + 1; // 1-12
-            const hour = now.getHours();
-            
-            // Determine location type based on coordinates
-            let locationType = 'unknown';
-            let locationName = weatherData?.name || "Your Area";
-            let region = "Unknown Region";
-            
-            // Nepal regions based on coordinates
-            if (lat > 27.5 && lat < 30) {
-                if (lon > 83 && lon < 87) {
-                    locationType = 'central_hills';
-                    region = "Central Hill Region";
-                } else if (lon > 87) {
-                    locationType = 'eastern_hills';
-                    region = "Eastern Hill Region";
-                } else {
-                    locationType = 'western_hills';
-                    region = "Western Hill Region";
-                }
-            } else if (lat <= 27.5) {
-                locationType = 'terai';
-                region = "Terai Plains";
-            } else {
-                locationType = 'high_himalayas';
-                region = "Himalayan Region";
-            }
-            
-            // Analyze weather risks
-            let weatherRisks = [];
-            let weatherDescription = "Weather data unavailable";
-            let temperature = "N/A";
-            let humidity = "N/A";
-            let rainIntensity = 0;
-            
-            if (weatherData) {
-                temperature = Math.round(weatherData.main.temp);
-                humidity = weatherData.main.humidity;
-                weatherDescription = weatherData.weather[0].description;
-                
-                // Check for rain
-                if (weatherData.weather[0].main.toLowerCase().includes('rain')) {
-                    weatherRisks.push('rain');
-                    rainIntensity = weatherData.rain ? weatherData.rain['1h'] || 0 : 1;
-                }
-                
-                // Check for thunderstorms
-                if (weatherData.weather[0].main.toLowerCase().includes('thunder')) {
-                    weatherRisks.push('thunderstorm');
-                }
-                
-                // Check for high winds
-                if (weatherData.wind.speed > 20) { // km/h
-                    weatherRisks.push('high_winds');
-                }
-                
-                // Check for extreme temperatures
-                if (temperature > 35) {
-                    weatherRisks.push('heat_wave');
-                } else if (temperature < 5) {
-                    weatherRisks.push('cold_wave');
-                }
-            }
-            
-            // Analyze earthquake risks
-            let earthquakeRisks = [];
-            let recentEarthquake = null;
-            
-            if (earthquakeData.length > 0) {
-                // Get the most recent significant earthquake
-                recentEarthquake = earthquakeData[0];
-                const magnitude = recentEarthquake.properties.mag;
-                
-                if (magnitude >= 5.0) {
-                    earthquakeRisks.push('significant_earthquake');
-                } else if (magnitude >= 4.0) {
-                    earthquakeRisks.push('minor_earthquake');
-                }
-            }
-            
-            // Analyze flood risks (based on season, location, and rainfall)
-            let floodRisks = [];
-            if (locationType === 'terai') {
-                // Terai is flood-prone, especially during monsoon
-                if (month >= 6 && month <= 9) { // Monsoon season
-                    floodRisks.push('monsoon_flood_risk');
-                }
-                if (rainIntensity > 10) { // Heavy rainfall
-                    floodRisks.push('heavy_rain_flood');
-                }
-            }
-            
-            // Analyze landslide risks (based on location, rainfall, and terrain)
-            let landslideRisks = [];
-            if (locationType.includes('hills') || locationType.includes('himalayas')) {
-                if (rainIntensity > 5) {
-                    landslideRisks.push('rain_induced_landslide');
-                }
-                if (earthquakeRisks.includes('significant_earthquake')) {
-                    landslideRisks.push('quake_induced_landslide');
-                }
-            }
-            
-            // Analyze forest fire risks
-            let fireRisks = [];
-            if (month >= 2 && month <= 5) { // Dry season
-                if (temperature > 30 && humidity < 30) {
-                    fireRisks.push('forest_fire_risk');
-                }
-            }
-            
-            return {
-                locationName,
-                region,
-                locationType,
-                weather: {
-                    description: weatherDescription,
-                    temperature,
-                    humidity,
-                    risks: weatherRisks,
-                    rainIntensity
                 },
-                earthquakes: {
-                    recent: recentEarthquake,
-                    risks: earthquakeRisks,
-                    count: earthquakeData.length
-                },
-                floods: {
-                    risks: floodRisks
-                },
-                landslides: {
-                    risks: landslideRisks
-                },
-                fires: {
-                    risks: fireRisks
-                },
-                timestamp: now.toLocaleString()
+                'landslide': {
+                    high: {
+                        title: 'Landslide Alert - High Risk',
+                        icon: 'fas fa-layer-group',
+                        alertTitle: 'Extreme Danger - Avoid Hillsides',
+                        description: 'Your area is at extreme risk of landslides due to terrain and rainfall.',
+                        riskLevel: 'HIGH RISK',
+                        riskColor: '#ef4444',
+                        preparedness: [
+                            'Evacuate immediately if in landslide-prone area during heavy rain',
+                            'Avoid all hillside roads, paths, and unstable slopes',
+                            'Listen for unusual sounds (trees cracking, boulders knocking)',
+                            'Watch for signs: new cracks in ground, tilting trees, bulging ground',
+                            'Move to stable ground away from base of slopes',
+                            'Do not return until authorities declare area safe'
+                        ],
+                        note: 'Landslides can occur suddenly with little warning. Move diagonally across slope if caught in one.'
+                    },
+                    medium: {
+                        title: 'Landslide Alert - Medium Risk',
+                        icon: 'fas fa-layer-group',
+                        alertTitle: 'Exercise Caution on Slopes',
+                        description: 'Your area has moderate landslide risk. Avoid unstable slopes.',
+                        riskLevel: 'MEDIUM RISK',
+                        riskColor: '#f59e0b',
+                        preparedness: [
+                            'Avoid hillside areas during and after heavy rainfall',
+                            'Watch for signs of soil movement or small slides',
+                            'Stay informed about rainfall forecasts and warnings',
+                            'Identify safe evacuation routes away from slopes',
+                            'Keep emergency supplies ready for quick evacuation',
+                            'Report any slope cracks or erosion to local authorities'
+                        ],
+                        note: 'Be particularly cautious after prolonged rainfall when soil is saturated.'
+                    },
+                    low: {
+                        title: 'Landslide Alert - Low Risk',
+                        icon: 'fas fa-layer-group',
+                        alertTitle: 'Stay Vigilant in Hilly Areas',
+                        description: 'Your area has low landslide risk. Basic precautions recommended.',
+                        riskLevel: 'LOW RISK',
+                        riskColor: '#10b981',
+                        preparedness: [
+                            'Avoid steep slopes and cuttings during heavy rain',
+                            'Monitor weather conditions during monsoon season',
+                            'Know signs of potential landslides: tilted poles, cracks',
+                            'Have emergency contact numbers for local disaster management',
+                            'Stay on established trails in hilly areas',
+                            'Report any slope instability or erosion to authorities'
+                        ],
+                        note: 'Even low-risk areas can experience landslides during extreme weather.'
+                    }
+                }
             };
-        }
-        
-        // Function to update UI with real data
-        function updateCurrentSituationUI(analysis) {
-            const now = new Date();
             
-            // Update weather info
-            document.getElementById('weather-info').textContent = 
-                `${analysis.weather.description}, ${analysis.weather.temperature}°C, Humidity: ${analysis.weather.humidity}%`;
-            document.getElementById('weather-time').textContent = analysis.timestamp;
-            document.getElementById('weather-location').textContent = analysis.locationName;
-            
-            // Update earthquake info
-            if (analysis.earthquakes.recent) {
-                const eq = analysis.earthquakes.recent;
-                const mag = eq.properties.mag;
-                const place = eq.properties.place;
-                const time = new Date(eq.properties.time).toLocaleTimeString();
+            // Function to show alert details modal
+            function showAlertDetails(alertData) {
+                document.getElementById('modal-title').textContent = alertData.title;
+                document.getElementById('modal-icon').className = alertData.icon;
+                document.getElementById('modal-alert-title').textContent = alertData.alertTitle;
+                document.getElementById('modal-description').textContent = alertData.description;
+                document.getElementById('modal-note').textContent = alertData.note;
                 
-                document.getElementById('earthquake-info').innerHTML = 
-                    `<span class="text-red-300 font-bold">⚠ Magnitude ${mag} earthquake detected!</span><br>
-                     Location: ${place}<br>
-                     Time: ${time}`;
+                // Set risk level badge
+                const riskLevelElement = document.getElementById('modal-risk-level');
+                riskLevelElement.textContent = alertData.riskLevel;
+                riskLevelElement.style.background = alertData.riskColor;
+                riskLevelElement.style.color = 'white';
                 
-                if (mag >= 5.0) {
-                    document.getElementById('earthquake-info').innerHTML += 
-                        '<br><span class="text-yellow-300">Stay alert for aftershocks!</span>';
+                // Clear and add preparedness items
+                const preparednessList = document.getElementById('preparedness-list');
+                preparednessList.innerHTML = '';
+                
+                alertData.preparedness.forEach(item => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<i class="fas fa-check-circle"></i> ${item}`;
+                    preparednessList.appendChild(li);
+                });
+                
+                alertModal.style.display = 'flex';
+            }
+            
+            // Current district tracking
+            let currentDistrict = 'Kathmandu';
+            
+            // District risk database
+            const districtRiskData = {
+                'kathmandu': { earthquake: 'high', flood: 'low', landslide: 'medium' },
+                'pokhara': { earthquake: 'medium', flood: 'low', landslide: 'high' },
+                'biratnagar': { earthquake: 'low', flood: 'high', landslide: 'low' },
+                'nepalgunj': { earthquake: 'low', flood: 'high', landslide: 'low' },
+                'jhapa': { earthquake: 'medium', flood: 'high', landslide: 'low' },
+                'kaski': { earthquake: 'medium', flood: 'low', landslide: 'high' },
+                'saptari': { earthquake: 'low', flood: 'high', landslide: 'low' },
+                'sindhupalchok': { earthquake: 'high', flood: 'medium', landslide: 'high' },
+                'gorkha': { earthquake: 'high', flood: 'medium', landslide: 'high' },
+                'chitwan': { earthquake: 'medium', flood: 'medium', landslide: 'medium' },
+                'default': { earthquake: 'medium', flood: 'medium', landslide: 'medium' }
+            };
+            
+            // District air quality data
+            const airQualityData = {
+                'kathmandu': { aqi: 85, pm25: 42, level: 'Moderate' },
+                'pokhara': { aqi: 45, pm25: 22, level: 'Good' },
+                'biratnagar': { aqi: 132, pm25: 68, level: 'Unhealthy' },
+                'nepalgunj': { aqi: 98, pm25: 48, level: 'Moderate' },
+                'jhapa': { aqi: 65, pm25: 35, level: 'Moderate' },
+                'kaski': { aqi: 40, pm25: 20, level: 'Good' },
+                'saptari': { aqi: 110, pm25: 55, level: 'Unhealthy' },
+                'sindhupalchok': { aqi: 70, pm25: 38, level: 'Moderate' },
+                'default': { aqi: 75, pm25: 35, level: 'Moderate' }
+            };
+            
+            // District flood data
+            const floodData = {
+                'kathmandu': { level: 3.2, danger: 4.5, status: 'Normal', river: 'Bagmati' },
+                'pokhara': { level: 1.8, danger: 3.0, status: 'Normal', river: 'Seti' },
+                'biratnagar': { level: 5.8, danger: 6.5, status: 'Warning', river: 'Koshi' },
+                'nepalgunj': { level: 4.2, danger: 5.0, status: 'Normal', river: 'Karnali' },
+                'jhapa': { level: 6.1, danger: 7.0, status: 'Warning', river: 'Mechi' },
+                'kaski': { level: 2.5, danger: 4.0, status: 'Normal', river: 'Seti' },
+                'saptari': { level: 7.2, danger: 8.0, status: 'Alert', river: 'Koshi' },
+                'sindhupalchok': { level: 3.8, danger: 6.0, status: 'Normal', river: 'Indrawati' },
+                'default': { level: 3.0, danger: 5.0, status: 'Normal', river: 'Local River' }
+            };
+            
+            // District weather data
+            const weatherData = {
+                'kathmandu': { temp: 22, condition: 'Partly Cloudy', humidity: 65, wind: 8, feelsLike: 23, icon: 'fa-cloud-sun' },
+                'pokhara': { temp: 20, condition: 'Light Rain', humidity: 75, wind: 5, feelsLike: 21, icon: 'fa-cloud-rain' },
+                'biratnagar': { temp: 32, condition: 'Hot and Humid', humidity: 70, wind: 12, feelsLike: 35, icon: 'fa-sun' },
+                'nepalgunj': { temp: 30, condition: 'Clear', humidity: 60, wind: 10, feelsLike: 32, icon: 'fa-sun' },
+                'jhapa': { temp: 28, condition: 'Partly Cloudy', humidity: 68, wind: 6, feelsLike: 30, icon: 'fa-cloud-sun' },
+                'kaski': { temp: 20, condition: 'Light Rain', humidity: 80, wind: 4, feelsLike: 21, icon: 'fa-cloud-rain' },
+                'saptari': { temp: 32, condition: 'Hot', humidity: 65, wind: 15, feelsLike: 36, icon: 'fa-sun' },
+                'sindhupalchok': { temp: 18, condition: 'Cool', humidity: 70, wind: 7, feelsLike: 19, icon: 'fa-cloud' },
+                'gorkha': { temp: 21, condition: 'Partly Cloudy', humidity: 72, wind: 6, feelsLike: 22, icon: 'fa-cloud-sun' },
+                'chitwan': { temp: 26, condition: 'Clear', humidity: 65, wind: 8, feelsLike: 28, icon: 'fa-sun' },
+                'default': { temp: 25, condition: 'Partly Cloudy', humidity: 65, wind: 8, feelsLike: 26, icon: 'fa-cloud-sun' }
+            };
+            
+            // Real-time data functions
+            function updateAirQualityData() {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                let districtKey = currentDistrict.toLowerCase();
+                const data = airQualityData[districtKey] || airQualityData['default'];
+                
+                document.getElementById('air-quality-value').textContent = data.aqi;
+                document.getElementById('air-quality-desc').textContent = data.level;
+                document.getElementById('air-quality-pm25').textContent = `${data.pm25} μg/m³`;
+                document.getElementById('air-quality-location').textContent = currentDistrict;
+                document.getElementById('air-quality-time').textContent = timeString;
+                
+                const aqiPosition = Math.min((data.aqi / 500) * 100, 100);
+                document.getElementById('aqi-marker').style.left = `${aqiPosition}%`;
+                
+                let statusColor = '';
+                if (data.aqi <= 50) statusColor = 'var(--aqi-good)';
+                else if (data.aqi <= 100) statusColor = 'var(--aqi-moderate)';
+                else if (data.aqi <= 150) statusColor = 'var(--aqi-sensitive)';
+                else if (data.aqi <= 200) statusColor = 'var(--aqi-unhealthy)';
+                else if (data.aqi <= 300) statusColor = 'var(--aqi-very-unhealthy)';
+                else statusColor = 'var(--aqi-hazardous)';
+                
+                document.getElementById('aqi-marker').style.borderColor = statusColor;
+            }
+            
+            function updateFloodAlertData() {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                let districtKey = currentDistrict.toLowerCase();
+                const data = floodData[districtKey] || floodData['default'];
+                
+                const percentage = (data.level / data.danger) * 100;
+                
+                document.getElementById('flood-level-value').textContent = data.level.toFixed(1);
+                document.getElementById('flood-alert-desc').textContent = data.status;
+                document.getElementById('flood-river').textContent = data.river;
+                document.getElementById('flood-danger-level').textContent = `${data.danger} m`;
+                document.getElementById('flood-alert-time').textContent = timeString;
+                
+                const markerPosition = Math.min(percentage, 100);
+                document.getElementById('flood-marker').style.left = `${markerPosition}%`;
+                
+                let statusColor = '';
+                if (percentage < 50) statusColor = 'var(--accent-green)';
+                else if (percentage < 75) statusColor = 'var(--accent-blue)';
+                else if (percentage < 100) statusColor = 'var(--accent-orange)';
+                else statusColor = 'var(--accent-red)';
+                
+                document.getElementById('flood-marker').style.borderColor = statusColor;
+            }
+            
+            function updateWeatherData() {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                let districtKey = currentDistrict.toLowerCase();
+                const data = weatherData[districtKey] || weatherData['default'];
+                
+                document.getElementById('weather-location-name').textContent = currentDistrict;
+                document.getElementById('weather-update-time').textContent = `Updated: ${timeString}`;
+                document.getElementById('weather-temp').textContent = `${data.temp}°C`;
+                document.getElementById('weather-condition').textContent = data.condition;
+                document.getElementById('weather-humidity').textContent = `${data.humidity}%`;
+                document.getElementById('weather-wind').textContent = `${data.wind} km/h`;
+                document.getElementById('weather-feels-like').textContent = `${data.feelsLike}°C`;
+                document.getElementById('weather-icon').className = `fas ${data.icon}`;
+            }
+            
+            // Update weather for specific location (for map clicks)
+            function updateWeatherForLocation(locationName) {
+                const now = new Date();
+                const timeString = now.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                let districtKey = locationName.toLowerCase();
+                const data = weatherData[districtKey] || weatherData['default'];
+                
+                document.getElementById('weather-location-name').textContent = locationName;
+                document.getElementById('weather-update-time').textContent = `Updated: ${timeString}`;
+                document.getElementById('weather-temp').textContent = `${data.temp}°C`;
+                document.getElementById('weather-condition').textContent = data.condition;
+                document.getElementById('weather-humidity').textContent = `${data.humidity}%`;
+                document.getElementById('weather-wind').textContent = `${data.wind} km/h`;
+                document.getElementById('weather-feels-like').textContent = `${data.feelsLike}°C`;
+                document.getElementById('weather-icon').className = `fas ${data.icon}`;
+            }
+            
+            // Generate alert cards based on current district
+            function generateAlertCards() {
+                const container = document.getElementById('alert-cards-container');
+                container.innerHTML = '';
+                
+                const alertTypes = ['earthquake', 'flood', 'landslide'];
+                const districtKey = currentDistrict.toLowerCase();
+                const risks = districtRiskData[districtKey] || districtRiskData['default'];
+                
+                alertTypes.forEach(type => {
+                    const riskLevel = risks[type] || 'medium';
+                    const riskClass = `${riskLevel}-risk`;
+                    const alertData = preparednessData[type][riskLevel];
+                    const icons = {
+                        'earthquake': 'fas fa-bolt',
+                        'flood': 'fas fa-water',
+                        'landslide': 'fas fa-layer-group'
+                    };
+                    
+                    const card = document.createElement('div');
+                    card.className = `alert-card ${riskClass}`;
+                    card.dataset.type = type;
+                    card.dataset.risk = riskLevel;
+                    
+                    card.innerHTML = `
+                        <div class="alert-header">
+                            <div class="alert-icon">
+                                <i class="${icons[type]}"></i>
+                            </div>
+                            <span class="alert-badge">${riskLevel.toUpperCase()} RISK</span>
+                        </div>
+                        <h3 class="alert-title">${type.charAt(0).toUpperCase() + type.slice(1)} Alert</h3>
+                        <p class="alert-description">${alertData.alertTitle}</p>
+                        <div class="alert-actions">
+                            <span class="alert-click-hint">
+                                <i class="fas fa-hand-pointer"></i>
+                                Click for preparedness details
+                            </span>
+                            <span style="font-size: 12px; color: var(--text-secondary);">
+                                <i class="far fa-clock"></i> Updated: ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                            </span>
+                        </div>
+                    `;
+                    
+                    card.addEventListener('click', function() {
+                        showAlertDetails(alertData);
+                    });
+                    
+                    container.appendChild(card);
+                });
+            }
+            
+            // District selection
+            const districtSelect = document.getElementById('district-select');
+            const getLocationBtn = document.getElementById('get-location-btn');
+            const locationStatus = document.getElementById('location-status');
+            const getMyLocationBtn = document.getElementById('get-my-location-btn');
+            const showOtherBtn = document.getElementById('show-other-btn');
+            
+            // All 77 districts of Nepal
+            const allDistricts = {
+                "Province 1": ["Bhojpur", "Dhankuta", "Ilam", "Jhapa", "Khotang", "Morang", "Okhaldhunga", "Panchthar", "Sankhuwasabha", "Solukhumbu", "Sunsari", "Taplejung", "Terhathum", "Udayapur"],
+                "Province 2": ["Saptari", "Siraha", "Dhanusha", "Mahottari", "Sarlahi", "Rautahat", "Bara", "Parsa"],
+                "Bagmati": ["Dolakha", "Ramechhap", "Sindhuli", "Kathmandu", "Bhaktapur", "Lalitpur", "Kavrepalanchok", "Nuwakot", "Rasuwa", "Dhading", "Makwanpur", "Chitwan"],
+                "Gandaki": ["Gorkha", "Lamjung", "Tanahun", "Syangja", "Kaski", "Manang", "Mustang", "Myagdi", "Parbat", "Baglung", "Nawalpur"],
+                "Lumbini": ["Rupandehi", "Kapilvastu", "Arghakhanchi", "Gulmi", "Palpa", "Nawalparasi West", "Nawalparasi East", "Dang", "Pyuthan", "Rolpa", "Eastern Rukum", "Banke", "Bardiya"],
+                "Karnali": ["Western Rukum", "Salyan", "Dolpa", "Mugu", "Humla", "Jumla", "Kalikot", "Dailekh", "Jajarkot", "Surkhet"],
+                "Sudurpashchim": ["Kailali", "Kanchanpur", "Dadeldhura", "Baitadi", "Darchula", "Bajhang", "Bajura", "Doti", "Achham"]
+            };
+            
+            // Populate district select
+            function populateAllDistricts() {
+                districtSelect.innerHTML = '<option value="">-- Select Your District --</option>';
+                
+                for (const province in allDistricts) {
+                    const optgroup = document.createElement('optgroup');
+                    optgroup.label = province;
+                    
+                    allDistricts[province].forEach(district => {
+                        const option = document.createElement('option');
+                        option.value = district;
+                        option.textContent = district;
+                        if (district === 'Kathmandu') option.selected = true;
+                        optgroup.appendChild(option);
+                    });
+                    
+                    districtSelect.appendChild(optgroup);
                 }
-            } else {
-                document.getElementById('earthquake-info').textContent = 
-                    "✅ No significant earthquakes detected in Nepal region (last 24 hours)";
             }
-            document.getElementById('earthquake-time').textContent = "Last 24 hours";
-            document.getElementById('earthquake-location').textContent = "Nepal Region";
             
-            // Update flood risk
-            let floodMessage = "✅ Low flood risk in your area";
-            if (analysis.floods.risks.length > 0) {
-                if (analysis.floods.risks.includes('monsoon_flood_risk')) {
-                    floodMessage = "⚠ MONSOON ALERT: High flood risk in Terai region";
-                } else if (analysis.floods.risks.includes('heavy_rain_flood')) {
-                    floodMessage = "⚠ HEAVY RAIN ALERT: Localized flooding possible";
+            // Initialize with all districts
+            populateAllDistricts();
+            
+            // Update alerts function
+            function updateAlerts(districtName) {
+                currentDistrict = districtName;
+                
+                // Update location status
+                locationStatus.innerHTML = `<i class="fas fa-map-marker-alt" style="color: var(--accent-green);"></i> Alerts for: ${districtName} District`;
+                
+                // Update all data
+                updateAirQualityData();
+                updateFloodAlertData();
+                updateWeatherData();
+                generateAlertCards();
+                
+                // Show success message
+                const originalText = getLocationBtn.innerHTML;
+                getLocationBtn.innerHTML = '<i class="fas fa-check"></i> Alerts Updated!';
+                getLocationBtn.style.background = 'var(--accent-green)';
+                
+                setTimeout(() => {
+                    getLocationBtn.innerHTML = '<i class="fas fa-bell"></i> Get Alerts';
+                    getLocationBtn.style.background = '';
+                }, 2000);
+            }
+            
+            // Get alerts button handler
+            getLocationBtn.addEventListener('click', function() {
+                const selectedDistrict = districtSelect.value;
+                
+                if (!selectedDistrict) {
+                    locationStatus.innerHTML = '<i class="fas fa-exclamation-triangle" style="color: var(--accent-orange);"></i> Please select a district first';
+                    return;
                 }
-            }
-            document.getElementById('flood-info').textContent = floodMessage;
-            document.getElementById('flood-time').textContent = analysis.timestamp;
-            document.getElementById('flood-location').textContent = analysis.region;
-            
-            // Update landslide risk
-            let landslideMessage = "✅ Low landslide risk in your area";
-            if (analysis.landslides.risks.length > 0) {
-                if (analysis.landslides.risks.includes('rain_induced_landslide')) {
-                    landslideMessage = "⚠ RAIN ALERT: Increased landslide risk in hilly areas";
-                } else if (analysis.landslides.risks.includes('quake_induced_landslide')) {
-                    landslideMessage = "⚠ EARTHQUAKE ALERT: Landslide risk elevated";
-                }
-            }
-            document.getElementById('landslide-info').textContent = landslideMessage;
-            document.getElementById('landslide-time').textContent = analysis.timestamp;
-            document.getElementById('landslide-location').textContent = analysis.region;
-            
-            // Update box colors based on risk levels
-            updateBoxColors(analysis);
-        }
-        
-        // Function to update box colors based on risk levels
-        function updateBoxColors(analysis) {
-            // Earthquake box
-            const eqBox = document.querySelector('#real-time-data > div:nth-child(2)');
-            if (analysis.earthquakes.risks.includes('significant_earthquake')) {
-                eqBox.className = eqBox.className.replace('border-blue-500', 'border-red-500');
-                eqBox.className = eqBox.className.replace('bg-blue-900', 'bg-red-900');
-            }
-            
-            // Flood box
-            const floodBox = document.querySelector('#real-time-data > div:nth-child(3)');
-            if (analysis.floods.risks.length > 0) {
-                floodBox.className = floodBox.className.replace('border-green-500', 'border-yellow-500');
-                floodBox.className = floodBox.className.replace('bg-green-900', 'bg-yellow-900');
-            }
-            
-            // Landslide box
-            const landslideBox = document.querySelector('#real-time-data > div:nth-child(4)');
-            if (analysis.landslides.risks.length > 0) {
-                landslideBox.className = landslideBox.className.replace('border-yellow-500', 'border-orange-500');
-                landslideBox.className = landslideBox.className.replace('bg-yellow-900', 'bg-orange-900');
-            }
-        }
-        
-        // Function to show generic Nepal data when location is unavailable
-        function showGenericNepalData() {
-            const now = new Date();
-            
-            // Show generic weather for Kathmandu
-            fetchWeatherData(27.7172, 85.3240).then(weatherData => {
-                if (weatherData) {
-                    document.getElementById('weather-info').textContent = 
-                        `${weatherData.weather[0].description}, ${Math.round(weatherData.main.temp)}°C, Humidity: ${weatherData.main.humidity}%`;
-                    document.getElementById('weather-location').textContent = "Kathmandu, Nepal";
-                }
+                
+                updateAlerts(selectedDistrict);
             });
             
-            document.getElementById('weather-time').textContent = now.toLocaleString();
-            document.getElementById('earthquake-info').textContent = "Checking seismic activity for Nepal...";
-            document.getElementById('flood-info').textContent = "Current monsoon status: Active (June-September)";
-            document.getElementById('landslide-info').textContent = "Monitor local weather for hill area warnings";
-        }
+            // Get user's location
+            getMyLocationBtn.addEventListener('click', function() {
+                const originalText = getMyLocationBtn.innerHTML;
+                getMyLocationBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Detecting...';
+                
+                setTimeout(() => {
+                    // Simulate location detection
+                    districtSelect.value = 'Kathmandu';
+                    updateAlerts('Kathmandu');
+                    
+                    getMyLocationBtn.innerHTML = originalText;
+                    
+                    // Show message
+                    const modal = document.createElement('div');
+                    modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; display: flex; justify-content: center; align-items: center;';
+                    modal.innerHTML = `
+                        <div style="background: var(--card-bg); border-radius: 20px; padding: 30px; max-width: 400px; width: 90%; border: 1px solid var(--border-color); text-align: center;">
+                            <h3 style="color: var(--accent-brown); margin-bottom: 15px;"><i class="fas fa-check-circle" style="color: var(--accent-green);"></i> Location Detected</h3>
+                            <p style="color: var(--text-secondary); margin-bottom: 20px;">Your location has been detected as <strong>Kathmandu</strong>. Alerts have been updated.</p>
+                            <button id="close-modal" style="background: var(--accent-brown); color: white; border: none; border-radius: 10px; padding: 12px 24px; font-weight: 600; cursor: pointer;">
+                                OK
+                            </button>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(modal);
+                    
+                    modal.querySelector('#close-modal').addEventListener('click', () => {
+                        document.body.removeChild(modal);
+                    });
+                    
+                    modal.addEventListener('click', (e) => {
+                        if (e.target === modal) {
+                            document.body.removeChild(modal);
+                        }
+                    });
+                }, 1500);
+            });
+            
+            // Initialize with default data
+            updateAirQualityData();
+            updateFloodAlertData();
+            updateWeatherData();
+            generateAlertCards();
+            
+            // Map initialization
+            let map;
+            let riskLayers = {};
+            
+            function initializeMap() {
+                // Initialize map centered on Nepal
+                map = L.map('interactive-map').setView([28.3949, 84.1240], 7);
+                
+                // Add tile layer
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors',
+                    maxZoom: 10,
+                    minZoom: 6
+                }).addTo(map);
+                
+                // Add search control
+                L.Control.geocoder({
+                    defaultMarkGeocode: false
+                }).on('markgeocode', function(e) {
+                    var bbox = e.geocode.bbox;
+                    map.fitBounds(bbox);
+                }).addTo(map);
+                
+                // Define risk zones with click functionality
+                const riskZones = [
+                    { name: 'Kathmandu', latlng: [27.7172, 85.3240], risks: ['earthquake'], level: 'high' },
+                    { name: 'Pokhara', latlng: [28.2096, 83.9856], risks: ['landslide'], level: 'high' },
+                    { name: 'Sindhupalchok', latlng: [27.9167, 85.5833], risks: ['earthquake', 'landslide'], level: 'high' },
+                    { name: 'Saptari', latlng: [26.5833, 86.8333], risks: ['flood'], level: 'high' },
+                    { name: 'Gorkha', latlng: [28.3333, 84.9167], risks: ['earthquake'], level: 'high' },
+                    { name: 'Biratnagar', latlng: [26.4833, 87.2833], risks: ['flood'], level: 'high' },
+                    { name: 'Nepalgunj', latlng: [28.0500, 81.6167], risks: ['flood'], level: 'medium' },
+                    { name: 'Kaski', latlng: [28.2096, 83.9856], risks: ['landslide'], level: 'high' },
+                    { name: 'Jhapa', latlng: [26.5833, 87.9167], risks: ['flood'], level: 'high' },
+                    { name: 'Chitwan', latlng: [27.5833, 84.5000], risks: ['flood', 'earthquake'], level: 'medium' }
+                ];
+                
+                // Create layer groups
+                riskLayers.earthquake = L.layerGroup();
+                riskLayers.flood = L.layerGroup();
+                riskLayers.landslide = L.layerGroup();
+                riskLayers.all = L.layerGroup();
+                
+                // Add markers for each risk zone
+                riskZones.forEach(zone => {
+                    let color;
+                    switch(zone.level) {
+                        case 'high': color = '#ef4444'; break;
+                        case 'medium': color = '#f59e0b'; break;
+                        case 'low': color = '#10b981'; break;
+                        default: color = '#6b7280';
+                    }
+                    
+                    // Create custom icon
+                    const icon = L.divIcon({
+                        className: 'custom-marker',
+                        html: `<div style="
+                            background: ${color};
+                            width: 24px;
+                            height: 24px;
+                            border-radius: 50%;
+                            border: 3px solid white;
+                            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            color: white;
+                            font-size: 12px;
+                            cursor: pointer;
+                        ">
+                            ${zone.risks.includes('earthquake') ? '⛰️' : 
+                              zone.risks.includes('flood') ? '🌊' : '⛰️'}
+                        </div>`,
+                        iconSize: [30, 30],
+                        iconAnchor: [15, 15]
+                    });
+                    
+                    const marker = L.marker(zone.latlng, { icon: icon })
+                        .bindPopup(`
+                            <div style="min-width: 200px;">
+                                <h4 style="margin: 0 0 8px 0; color: var(--accent-brown);">${zone.name}</h4>
+                                <p style="margin: 4px 0; font-size: 12px;">
+                                    <strong>Risk Level:</strong> 
+                                    <span style="color: ${color}; font-weight: bold;">${zone.level.toUpperCase()}</span>
+                                </p>
+                                <p style="margin: 4px 0; font-size: 12px;">
+                                    <strong>Primary Risks:</strong> ${zone.risks.join(', ')}
+                                </p>
+                                <button onclick="updateWeatherFromMap('${zone.name}')" 
+                                        style="width: 100%; margin-top: 8px; padding: 6px; background: var(--accent-brown); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
+                                    <i class="fas fa-cloud-sun"></i> View Weather
+                                </button>
+                            </div>
+                        `);
+                    
+                    // Add click handler to update district info
+                    marker.on('click', function() {
+                        const districtInfo = document.getElementById('district-info');
+                        const districtName = document.getElementById('district-name');
+                        const districtDescription = document.getElementById('district-description');
+                        const districtRisks = document.getElementById('district-risks');
+                        const districtTips = document.getElementById('district-tips');
+                        
+                        districtName.textContent = zone.name;
+                        districtDescription.textContent = `Located in Nepal with ${zone.level} risk level`;
+                        
+                        // Update weather widget
+                        updateWeatherForLocation(zone.name);
+                        
+                        // Clear and add risk tags
+                        districtRisks.innerHTML = '';
+                        zone.risks.forEach(risk => {
+                            const tag = document.createElement('span');
+                            tag.className = `risk-tag ${risk}`;
+                            tag.style.cssText = 'display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-right: 6px; margin-bottom: 6px;';
+                            if (risk === 'earthquake') {
+                                tag.style.background = 'rgba(197, 48, 48, 0.2)';
+                                tag.style.color = 'var(--accent-red)';
+                            } else if (risk === 'flood') {
+                                tag.style.background = 'rgba(56, 161, 105, 0.2)';
+                                tag.style.color = 'var(--accent-green)';
+                            } else {
+                                tag.style.background = 'rgba(210, 105, 30, 0.2)';
+                                tag.style.color = 'var(--accent-orange)';
+                            }
+                            tag.textContent = risk.charAt(0).toUpperCase() + risk.slice(1);
+                            districtRisks.appendChild(tag);
+                        });
+                        
+                        // Add tips
+                        let tips = '';
+                        if (zone.risks.includes('earthquake')) {
+                            tips += '• Secure heavy furniture and know evacuation routes. ';
+                        }
+                        if (zone.risks.includes('flood')) {
+                            tips += '• Prepare emergency supplies and evacuation plan. ';
+                        }
+                        if (zone.risks.includes('landslide')) {
+                            tips += '• Avoid hillside areas during heavy rain. ';
+                        }
+                        districtTips.textContent = tips || 'Regular emergency preparedness recommended.';
+                        
+                        districtInfo.style.display = 'block';
+                    });
+                    
+                    // Add to appropriate layers
+                    if (zone.risks.includes('earthquake')) riskLayers.earthquake.addLayer(marker);
+                    if (zone.risks.includes('flood')) riskLayers.flood.addLayer(marker);
+                    if (zone.risks.includes('landslide')) riskLayers.landslide.addLayer(marker);
+                    riskLayers.all.addLayer(marker);
+                });
+                
+                // Add all layers by default
+                riskLayers.all.addTo(map);
+                
+                // Add click handler to map to close district info
+                map.on('click', function() {
+                    document.getElementById('district-info').style.display = 'none';
+                });
+                
+                // Layer control buttons
+                document.querySelectorAll('.map-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const layer = this.getAttribute('data-layer');
+                        
+                        // Update button states
+                        document.querySelectorAll('.map-btn').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Remove all layers
+                        Object.values(riskLayers).forEach(layerGroup => {
+                            if (map.hasLayer(layerGroup)) {
+                                map.removeLayer(layerGroup);
+                            }
+                        });
+                        
+                        // Add selected layer
+                        if (layer === 'all') {
+                            riskLayers.all.addTo(map);
+                        } else {
+                            riskLayers[layer].addTo(map);
+                        }
+                    });
+                });
+                
+                // Make function available globally for popup button
+                window.updateWeatherFromMap = function(locationName) {
+                    updateWeatherForLocation(locationName);
+                };
+            }
+            
+            // Auto-refresh every 5 minutes
+            setInterval(() => {
+                updateAirQualityData();
+                updateFloodAlertData();
+                updateWeatherData();
+            }, 300000);
+            
+            // Initialize with home tab active
+            switchTab('home');
+        });
     </script>
 </body>
 </html>
