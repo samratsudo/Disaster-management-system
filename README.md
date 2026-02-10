@@ -1,93 +1,39 @@
- PROJECT OVERVIEW
+# HazardGuard Nepal
 
-Project Title: Disaster Alert Nepal
+![HazardGuard Banner](./assets/images/banner.png)
 
-Project Type: School Web Project
+HazardGuard Nepal is a disaster awareness and preparedness platform designed to enhance community safety through education, real-time information, and emergency resources.
 
-Purpose:
-To create a simple, web-based platform that improves disaster awareness, preparedness, and access to emergency information in Nepal using modern web technologies.
+## 🌟 Features
 
- – PROBLEM STATEMENT
+- **Interactive Risk Mapping**: Visualize disaster-prone areas across Nepal
+- **Real-time Alerts**: Get district-specific disaster alerts and environmental data
+- **Emergency Contacts**: Quick access to emergency services
+- **Weather Integration**: Location-specific weather information linked to map
+- **Practical Preparedness**: Actionable disaster preparedness tips
 
-Nepal is highly vulnerable to natural disasters
+## 🚀 Live Demo
 
-Frequent earthquakes, floods, landslides, and fires
+[View Live Demo](https://yourusername.github.io/hazardguard-nepal/)
 
-Disaster information is scattered and technical
+## 📱 Tech Stack
 
-Lack of real-time, location-based awareness
+- **Frontend**: HTML5, CSS3, JavaScript (ES6+)
+- **Maps**: Leaflet.js with OpenStreetMap
+- **Icons**: Font Awesome
+- **Fonts**: Google Fonts (DM Sans, Bodoni MT)
+- **Service Worker**: Progressive Web App (PWA) capabilities
 
-Emergency contacts are not easily accessible
+## 🛠️ Installation
 
-No simple, student-friendly disaster awareness platform
+### Prerequisites
+- Modern web browser
+- Node.js (for development)
+- Git
 
-– PROPOSED SOLUTION & OBJECTIVES
+### Local Development
 
-Proposed Solution:
-A single, easy-to-use web platform for disaster awareness and alerts.
-
-Objectives:
-
-Provide clear disaster-related information
-
-Show current disaster situation using real data
-
-Analyze risks based on user location
-
-Provide quick access to emergency services
-
-Promote disaster preparedness among students and public
-
- – DESIGN & USER EXPERIENCE
-
-Clean and modern dark-mode interface
-
-Color-coded alert system
-
-Red: Danger
-
-Yellow: Warning
-
-Green: Safe
-
-Tab-based navigation for fast access
-
-Responsive design for mobile and desktop
-
-Simple layout suitable for all age groups
-
-– TECHNICAL IMPLEMENTATION
-
-HTML for everything
-
-
-APIs Used:
-
-OpenWeatherMap API (live weather data)
-
-USGS Earthquake API (real-time seismic data)
-
-Additional Feature:
-
-Browser geolocation for location-based alerts
-
- – FEASIBILITY, IMPACT & CONCLUSION
-
-Feasibility:
-
-Uses free and reliable APIs
-
-Runs on any modern web browser
-
-Suitable for school-level development
-
-Expected Impact:
-
-Increased disaster awareness
-
-Better preparedness and safety
-
-Faster access to emergency contacts
-
-Conclusion:
-Disaster Alert Nepal is a practical, educational, and socially relevant project that demonstrates how web technology can support disaster awareness and public safety in Nepal.
+1. Clone the repository:
+```bash
+git clone https://github.com/yourusername/hazardguard-nepal.git
+cd hazardguard-nepal
