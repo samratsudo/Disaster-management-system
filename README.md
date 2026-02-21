@@ -2,7 +2,6 @@
 
 HazardGuard Nepal is a comprehensive disaster awareness and preparedness website designed for Nepal. It provides real‑time alerts for weather, air quality, floods, and earthquakes, along with an interactive risk map, emergency contacts, and a smart AI chatbot powered by OpenAI's ChatGPT.
 
-![Screenshot](screenshot.png) *(Add a screenshot of your website here)*
 
 ## Features
 
