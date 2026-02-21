@@ -36,4 +36,4 @@ HazardGuard Nepal is a comprehensive disaster awareness and preparedness website
 - **CORS Proxy**: `corsproxy.io` (required to use OpenAI directly from browser; for production, move to a backend)
 - **Icons**: Font Awesome 5
 
-## File Structure
+## The website link is https://hazardguard.netlify.app/ .
