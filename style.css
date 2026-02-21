@@ -1,3 +1,4 @@
+/* ========== FULL ORIGINAL DESIGN ========== */
 * {
     margin: 0;
     padding: 0;
@@ -34,24 +35,37 @@ body {
     color: var(--text-primary);
     line-height: 1.6;
     overflow-x: hidden;
+    opacity: 0;
+    animation: pageFadeIn 0.8s ease-out forwards;
 }
 
-/* Floating Navigation - More Translucent */
+@keyframes pageFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
 .floating-nav {
     position: fixed;
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(35px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(15px) saturate(180%);
+    -webkit-backdrop-filter: blur(15px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 50px;
     padding: 10px 20px;
     z-index: 1000;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
     display: flex;
     gap: 0;
     align-items: center;
+    transition: background 0.3s, box-shadow 0.3s;
+}
+
+.floating-nav:hover {
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 }
 
 .floating-nav button {
@@ -69,14 +83,15 @@ body {
 }
 
 .floating-nav button:hover {
-    background: rgba(139, 90, 43, 0.1);
+    background: rgba(139, 90, 43, 0.15);
     color: var(--accent-brown);
+    transform: scale(1.02);
 }
 
 .floating-nav button.active {
     background: var(--accent-brown);
     color: white;
-    box-shadow: 0 4px 12px rgba(139, 90, 43, 0.2);
+    box-shadow: 0 4px 12px rgba(139, 90, 43, 0.3);
 }
 
 .nav-divider {
@@ -85,7 +100,6 @@ body {
     padding: 0 8px;
 }
 
-/* Hero Section with Bodoni MT font for title */
 .hero-section {
     min-height: 100vh;
     display: flex;
@@ -108,6 +122,18 @@ body {
     position: relative;
     z-index: 2;
     padding: 40px;
+    animation: slideUp 1s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .hero-title {
@@ -163,7 +189,6 @@ body {
     transform: scaleX(1);
 }
 
-/* Main Content */
 main {
     position: relative;
     z-index: 1;
@@ -195,7 +220,6 @@ main {
     padding: 0 24px;
 }
 
-/* Section Cards */
 .section-card {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
@@ -203,6 +227,12 @@ main {
     padding: 48px;
     margin: 60px auto 40px;
     box-shadow: 0 8px 32px var(--shadow-light);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.section-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 48px var(--shadow-medium);
 }
 
 .section-title {
@@ -222,7 +252,6 @@ main {
     margin-bottom: 16px;
 }
 
-/* Map Section */
 .map-wrapper {
     border: 1px solid var(--border-color);
     border-radius: 20px;
@@ -230,6 +259,11 @@ main {
     margin: 40px 0;
     background: var(--card-bg);
     box-shadow: 0 8px 32px var(--shadow-light);
+    transition: box-shadow 0.3s;
+}
+
+.map-wrapper:hover {
+    box-shadow: 0 16px 48px var(--shadow-medium);
 }
 
 .map-header {
@@ -274,6 +308,7 @@ main {
 .map-btn:hover {
     background: rgba(139, 90, 43, 0.08);
     color: var(--text-primary);
+    transform: translateY(-2px);
 }
 
 .map-btn.active {
@@ -302,7 +337,6 @@ main {
     border-radius: 16px;
 }
 
-/* NEW: Disaster Alert Cards */
 .alert-cards-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -322,7 +356,7 @@ main {
 }
 
 .alert-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-5px) scale(1.02);
     box-shadow: 0 12px 32px var(--shadow-medium);
 }
 
@@ -453,7 +487,6 @@ main {
     }
 }
 
-/* Real-time Data Widgets for Disaster Alert */
 .realtime-widgets {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -606,7 +639,6 @@ main {
     transform: translateX(-50%);
 }
 
-/* Legend Items */
 .legend-item {
     display: flex;
     align-items: center;
@@ -624,7 +656,6 @@ main {
     font-size: 12px;
 }
 
-/* Weather Widget in Mapping Tab */
 .weather-widget-mapping {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
@@ -712,7 +743,6 @@ main {
     color: var(--text-primary);
 }
 
-/* Emergency Cards */
 .emergency-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -728,6 +758,8 @@ main {
     cursor: pointer;
     transition: all 0.3s;
     text-align: center;
+    text-decoration: none;
+    color: inherit;
 }
 
 .emergency-card:hover {
@@ -763,7 +795,6 @@ main {
     font-weight: 800;
 }
 
-/* About Us Section */
 .team-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -798,16 +829,19 @@ main {
     font-weight: 600;
     overflow: hidden;
     border: 3px solid var(--accent-tan);
+    background: linear-gradient(135deg, var(--accent-brown), var(--accent-orange));
+    transition: transform 0.3s, box-shadow 0.3s;
 }
 
-.member-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center center;
+.member-avatar:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
 }
 
-/* Footer */
+.member-avatar span {
+    display: block;
+}
+
 footer {
     padding: 60px 0 40px;
     border-top: 1px solid var(--border-color);
@@ -829,7 +863,6 @@ footer {
     margin: 0 auto 32px;
 }
 
-/* Checklist Container */
 .checklist-container {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
@@ -861,7 +894,6 @@ footer {
     accent-color: var(--accent-brown);
 }
 
-/* Location Button Styles */
 .location-buttons {
     display: flex;
     gap: 12px;
@@ -897,7 +929,6 @@ footer {
     background: rgba(139, 90, 43, 0.05);
 }
 
-/* Refresh button */
 .refresh-btn {
     padding: 8px 16px;
     background: var(--accent-blue);
@@ -932,7 +963,6 @@ footer {
     }
 }
 
-/* Modal for Alert Details */
 .alert-modal {
     display: none;
     position: fixed;
@@ -1014,6 +1044,152 @@ footer {
     margin-top: 2px;
 }
 
+.chatbot-icon {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: var(--accent-brown);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    z-index: 1500;
+    transition: all 0.3s;
+    animation: pulse 2s infinite;
+}
+
+.chatbot-icon:hover {
+    transform: scale(1.1);
+    background: var(--accent-orange);
+    animation: none;
+}
+
+.chatbot-window {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    width: 350px;
+    height: 450px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 1501;
+    border: 1px solid var(--border-color);
+    animation: slideInChat 0.3s ease-out;
+    display: none;
+}
+
+@keyframes slideInChat {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.chatbot-header {
+    background: var(--accent-brown);
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chatbot-header h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.chatbot-close {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.chatbot-messages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    background: #f9f7f4;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.message {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.4;
+    word-wrap: break-word;
+}
+
+.bot-message {
+    background: var(--accent-tan);
+    color: var(--text-primary);
+    align-self: flex-start;
+    border-bottom-left-radius: 5px;
+}
+
+.user-message {
+    background: var(--accent-brown);
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 5px;
+}
+
+.chatbot-input-area {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid var(--border-color);
+    background: white;
+}
+
+.chatbot-input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    outline: none;
+    font-size: 14px;
+}
+
+.chatbot-send {
+    background: var(--accent-brown);
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-left: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.3s;
+}
+
+.chatbot-send:hover {
+    background: var(--accent-orange);
+}
+
 @media (max-width: 768px) {
     .hero-title {
         font-size: 48px;
@@ -1084,5 +1260,16 @@ footer {
     
     .weather-icon {
         font-size: 48px;
+    }
+
+    .chatbot-window {
+        width: 300px;
+        right: 15px;
+        bottom: 90px;
+    }
+
+    .chatbot-icon {
+        bottom: 20px;
+        right: 20px;
     }
 }
