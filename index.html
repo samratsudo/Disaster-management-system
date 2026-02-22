@@ -5,34 +5,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HazardGuard Nepal - Disaster Awareness & Preparedness</title>
-    <meta name="description" content="Disaster awareness and preparedness website for Nepal with real-time alerts and emergency information">
+    <meta name="description" content="Disaster awareness and preparedness platform for Nepal with real-time alerts and emergency information">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#8b5a2b">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Floating Navigation -->
+
+    <!-- ── FLOATING NAV ── -->
     <div class="floating-nav">
-        <button class="active" data-tab="home" id="nav-home">Home</button>
+        <button class="active" data-tab="home"          id="nav-home">Home</button>
         <span class="nav-divider">|</span>
-        <button data-tab="mapping" id="nav-mapping">Mapping</button>
+        <button data-tab="mapping"       id="nav-mapping">Mapping</button>
         <span class="nav-divider">|</span>
         <button data-tab="disaster-alert" id="nav-disaster">Disaster Alert</button>
         <span class="nav-divider">|</span>
-        <button data-tab="emergency" id="nav-emergency">Emergency</button>
+        <button data-tab="emergency"     id="nav-emergency">Emergency</button>
         <span class="nav-divider">|</span>
-        <button data-tab="about" id="nav-about">About Us</button>
+        <button data-tab="about"         id="nav-about">About Us</button>
     </div>
 
-    <!-- Language Toggle Switch (Bottom Left) -->
+    <!-- ── LANGUAGE TOGGLE ── -->
     <div class="language-toggle">
         <span class="lang-label active" id="lang-en">EN</span>
         <label class="switch">
@@ -43,42 +39,60 @@
     </div>
 
     <main>
-        <!-- Home Tab -->
+
+        <!-- ════════════════════════════ HOME TAB ════════════════════════════ -->
         <div id="home" class="tab-content active">
             <div class="hero-section">
                 <div class="hero-content">
                     <h1 class="hero-title" id="hero-title">HazardGuard</h1>
                     <p class="hero-subtitle" id="hero-subtitle">
-                        HazardGuard is a disaster awareness and preparedness website that helps people learn about natural hazards like earthquakes, floods, and landslides in Nepal and provides real‑time alerts and emergency contact information to stay safe.
+                        HazardGuard is a disaster awareness and preparedness website that helps people learn about
+                        natural hazards like earthquakes, floods, and landslides in Nepal and provides real‑time
+                        alerts and emergency contact information to stay safe.
                     </p>
-                    <button class="discover-btn" data-tab="mapping" id="discover-btn">Discover</button>
+                    <button class="discover-btn" id="discover-btn">Discover</button>
                 </div>
             </div>
             <div class="container">
                 <div class="section-card">
                     <h2 class="section-title" id="home-title">Understanding Disaster Risks in Nepal</h2>
                     <div class="content-text" id="home-text1">
-                        <p>Natural disasters in Nepal occur unexpectedly and can cause severe damage to communities. The country's diverse geography makes it vulnerable to various hazards that threaten lives and property.</p>
-                        <p>Early warning systems and public awareness are crucial for reducing disaster risks. Timely alerts allow communities to prepare, evacuate if necessary, and minimize casualties.</p>
+                        <p>Natural disasters in Nepal occur unexpectedly and can cause severe damage to communities.
+                        The country's diverse geography makes it vulnerable to various hazards that threaten lives and property.</p>
+                        <p>Early warning systems and public awareness are crucial for reducing disaster risks.
+                        Timely alerts allow communities to prepare, evacuate if necessary, and minimize casualties.</p>
                     </div>
                     <div class="checklist-container">
-                        <h3 style="margin-bottom:20px; font-size:22px; color:var(--accent-brown);" id="checklist-title"><i class="fas fa-clipboard-check"></i> Quick Preparedness Checklist</h3>
-                        <div class="checklist-item"><input type="checkbox" id="check1"><label for="check1" id="check1-label">Create a family emergency plan with meeting points</label></div>
-                        <div class="checklist-item"><input type="checkbox" id="check2"><label for="check2" id="check2-label">Prepare a 3-day emergency supply kit</label></div>
-                        <div class="checklist-item"><input type="checkbox" id="check3"><label for="check3" id="check3-label">Know your nearest emergency shelter location</label></div>
+                        <h3 style="margin-bottom:20px;font-size:22px;color:var(--accent-brown);" id="checklist-title">
+                            <i class="fas fa-clipboard-check"></i> Quick Preparedness Checklist
+                        </h3>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check1">
+                            <label for="check1" id="check1-label">Create a family emergency plan with meeting points</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check2">
+                            <label for="check2" id="check2-label">Prepare a 3-day emergency supply kit</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check3">
+                            <label for="check3" id="check3-label">Know your nearest emergency shelter location</label>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Mapping Tab -->
+        <!-- ════════════════════════════ MAPPING TAB ════════════════════════════ -->
         <div id="mapping" class="tab-content">
             <div class="container">
                 <div class="section-card">
-                    <h2 class="section-title" id="mapping-title">Nepal Disaster & Environmental Risk Visualization</h2>
+                    <h2 class="section-title" id="mapping-title">Nepal Disaster &amp; Environmental Risk Visualization</h2>
                     <div class="content-text" id="mapping-text">
-                        <p>Visual representation of disaster-prone areas across Nepal. Select different layers to see specific risk types. Click on any location marker to see its weather information.</p>
+                        <p>Visual representation of disaster-prone areas across Nepal's 65+ districts.
+                        Select different layers to see specific risk types. Click any marker for live data.</p>
                     </div>
+
                     <!-- Weather Widget -->
                     <div class="weather-widget-mapping">
                         <div class="weather-header">
@@ -96,28 +110,37 @@
                             <div class="weather-icon"><i class="fas fa-cloud-sun" id="weather-icon"></i></div>
                         </div>
                         <div class="weather-details">
-                            <div class="weather-detail"><div class="weather-detail-label" id="weather-humidity-label">Humidity</div><div class="weather-detail-value" id="weather-humidity">--%</div></div>
-                            <div class="weather-detail"><div class="weather-detail-label" id="weather-wind-label">Wind Speed</div><div class="weather-detail-value" id="weather-wind">-- km/h</div></div>
-                            <div class="weather-detail"><div class="weather-detail-label" id="weather-feels-label">Feels Like</div><div class="weather-detail-value" id="weather-feels-like">--°C</div></div>
+                            <div class="weather-detail">
+                                <div class="weather-detail-label" id="weather-humidity-label">Humidity</div>
+                                <div class="weather-detail-value" id="weather-humidity">--%</div>
+                            </div>
+                            <div class="weather-detail">
+                                <div class="weather-detail-label" id="weather-wind-label">Wind Speed</div>
+                                <div class="weather-detail-value" id="weather-wind">-- km/h</div>
+                            </div>
+                            <div class="weather-detail">
+                                <div class="weather-detail-label" id="weather-feels-label">Feels Like</div>
+                                <div class="weather-detail-value" id="weather-feels-like">--°C</div>
+                            </div>
                         </div>
                     </div>
+
                     <!-- Map -->
                     <div class="map-wrapper">
                         <div class="map-header">
                             <h3 id="map-title">Interactive Risk Map</h3>
                             <div class="map-controls">
-                                <button class="map-btn active" data-layer="all" id="map-all"><i class="fas fa-layer-group"></i> All Risks</button>
-                                <button class="map-btn" data-layer="earthquake" id="map-earthquake"><i class="fas fa-bolt"></i> Earthquakes</button>
-                                <button class="map-btn" data-layer="flood" id="map-flood"><i class="fas fa-water"></i> Flood Risk</button>
-                                <button class="map-btn" data-layer="landslide" id="map-landslide"><i class="fas fa-layer-group"></i> Landslides</button>
+                                <button class="map-btn active" data-layer="all"        id="map-all">       <i class="fas fa-layer-group"></i> <span id="map-all-text">All Risks</span></button>
+                                <button class="map-btn"        data-layer="earthquake" id="map-earthquake"><i class="fas fa-bolt"></i>        <span id="map-eq-text">Earthquakes</span></button>
+                                <button class="map-btn"        data-layer="flood"      id="map-flood">     <i class="fas fa-water"></i>       <span id="map-flood-text">Flood Risk</span></button>
+                                <button class="map-btn"        data-layer="landslide"  id="map-landslide"> <i class="fas fa-mountain"></i>    <span id="map-ls-text">Landslides</span></button>
                             </div>
                         </div>
                         <div class="map-container">
                             <div id="district-info" class="district-info" style="display:none;">
                                 <h4 id="district-name">Select a District</h4>
-                                <p id="district-description">Click on any district to see detailed risk information.</p>
+                                <p  id="district-description">Click on any district marker to see live risk data.</p>
                                 <div id="district-risks"></div>
-                                <p id="district-tips"></p>
                             </div>
                             <div class="map-display">
                                 <div id="interactive-map"></div>
@@ -134,14 +157,16 @@
             </div>
         </div>
 
-        <!-- Disaster Alert Tab -->
+        <!-- ════════════════════════════ DISASTER ALERT TAB ════════════════════════════ -->
         <div id="disaster-alert" class="tab-content">
             <div class="container">
                 <div class="section-card">
                     <h2 class="section-title" id="alert-title">Real-time Disaster Alert System</h2>
                     <div class="content-text" id="alert-text">
-                        <p>Get real-time alerts and environmental data for your selected district. Click on any alert card to see specific preparedness actions.</p>
+                        <p>Get real-time alerts and environmental data for your selected district.
+                        Click on any alert card to see specific preparedness actions.</p>
                     </div>
+
                     <!-- Location Selection -->
                     <div class="location-section">
                         <div class="location-prompt">
@@ -149,22 +174,31 @@
                             <span id="location-status">Select your district or use your current location</span>
                             <div class="district-select-wrapper">
                                 <div class="location-buttons">
-                                    <button id="get-my-location-btn" class="location-btn"><i class="fas fa-location-arrow"></i> <span id="use-location">Use My Location</span></button>
-                                    <button id="show-other-btn" class="location-btn secondary"><span id="see-other">Wanna see other?</span></button>
+                                    <button id="get-my-location-btn" class="location-btn">
+                                        <i class="fas fa-location-arrow"></i>
+                                        <span id="use-location">Use My Location</span>
+                                    </button>
+                                    <button id="show-other-btn" class="location-btn secondary">
+                                        <span id="see-other">See Other Districts</span>
+                                    </button>
                                 </div>
                                 <select id="district-select">
                                     <option value="" id="select-district">-- Select Your District --</option>
                                 </select>
-                                <button id="get-location-btn" class="location-btn primary"><i class="fas fa-bell"></i> <span id="get-alerts">Get Alerts</span></button>
+                                <button id="get-location-btn" class="location-btn primary">
+                                    <i class="fas fa-bell"></i>
+                                    <span id="get-alerts">Get Alerts</span>
+                                </button>
                             </div>
                         </div>
                     </div>
-                    <!-- Real-time Widgets -->
+
+                    <!-- Realtime Widgets -->
                     <div class="realtime-widgets">
                         <div class="realtime-card" id="air-quality-widget">
                             <div class="realtime-header">
                                 <h3 class="realtime-title"><i class="fas fa-wind"></i> <span id="air-title">Air Quality</span></h3>
-                                <span class="realtime-status status-live" id="air-quality-status">Live</span>
+                                <span class="realtime-status status-live">Live</span>
                             </div>
                             <div class="realtime-value"><span id="air-quality-value">--</span><span class="realtime-unit">AQI</span></div>
                             <div class="aqi-indicator"><div class="aqi-marker" id="aqi-marker" style="left:0%;"></div></div>
@@ -174,33 +208,37 @@
                                 <div class="detail-item"><span class="detail-label" id="location-label">Location</span><span class="detail-value" id="air-quality-location">Select District</span></div>
                                 <div class="detail-item"><span class="detail-label" id="updated-label">Updated</span><span class="detail-value" id="air-quality-time">--</span></div>
                             </div>
-                            <div class="realtime-source"><i class="fas fa-database"></i> Data Source: IQAir</div>
+                            <div class="realtime-source"><i class="fas fa-satellite"></i> Open-Meteo Air Quality API</div>
                         </div>
                         <div class="realtime-card" id="flood-alert-widget">
                             <div class="realtime-header">
                                 <h3 class="realtime-title"><i class="fas fa-water"></i> <span id="flood-title">Flood Alert</span></h3>
-                                <span class="realtime-status status-live" id="flood-alert-status">Live</span>
+                                <span class="realtime-status status-live">Live</span>
                             </div>
-                            <div class="realtime-value"><span id="flood-level-value">--</span><span class="realtime-unit">m</span></div>
+                            <div class="realtime-value"><span id="flood-level-value">--</span><span class="realtime-unit">m³/s</span></div>
                             <div class="flood-level-indicator"><div class="flood-marker" id="flood-marker" style="left:0%;"></div></div>
                             <div class="realtime-details">
                                 <div class="detail-item"><span class="detail-label" id="flood-status-label">Status</span><span class="detail-value" id="flood-alert-desc">--</span></div>
                                 <div class="detail-item"><span class="detail-label" id="river-label">River</span><span class="detail-value" id="flood-river">--</span></div>
-                                <div class="detail-item"><span class="detail-label" id="danger-label">Danger Level</span><span class="detail-value" id="flood-danger-level">-- m</span></div>
+                                <div class="detail-item"><span class="detail-label" id="danger-label">Danger Level</span><span class="detail-value" id="flood-danger-level">-- m³/s</span></div>
                                 <div class="detail-item"><span class="detail-label" id="flood-updated-label">Updated</span><span class="detail-value" id="flood-alert-time">--</span></div>
                             </div>
-                            <div class="realtime-source"><i class="fas fa-database"></i> Data Source: Nepal DHM</div>
+                            <div class="realtime-source"><i class="fas fa-satellite"></i> Open-Meteo Flood API</div>
                         </div>
                     </div>
-                    <div style="text-align:center; margin:20px 0;">
-                        <button class="refresh-btn" id="refresh-realtime-data"><i class="fas fa-sync-alt"></i> <span id="refresh-text">Refresh Real-time Data</span></button>
+
+                    <div style="text-align:center;margin:24px 0;">
+                        <button class="refresh-btn" id="refresh-realtime-data">
+                            <i class="fas fa-sync-alt"></i> <span id="refresh-text">Refresh Real-time Data</span>
+                        </button>
                     </div>
+
                     <div class="alert-cards-container" id="alert-cards-container"></div>
                 </div>
             </div>
         </div>
 
-        <!-- Emergency Tab -->
+        <!-- ════════════════════════════ EMERGENCY TAB ════════════════════════════ -->
         <div id="emergency" class="tab-content">
             <div class="container">
                 <div class="section-card">
@@ -208,31 +246,39 @@
                     <p class="subtitle" id="emergency-subtitle">Click any number to call immediately from your device.</p>
                     <div class="emergency-grid">
                         <a href="tel:100" class="emergency-card">
-                            <div class="emergency-icon-wrapper" style="background:linear-gradient(135deg, rgba(197,48,48,0.15), rgba(197,48,48,0.1)); color:var(--accent-red);"><i class="fas fa-shield-alt"></i></div>
+                            <div class="emergency-icon-wrapper" style="background:linear-gradient(135deg,rgba(197,48,48,0.15),rgba(197,48,48,0.05));color:var(--accent-red);">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
                             <h3 id="police-title">Police</h3>
-                            <p class="subtitle" id="police-desc">Emergency response & law enforcement</p>
-                            <div class="emergency-number"><i class="fas fa-phone"></i><span>100</span></div>
+                            <p class="subtitle" id="police-desc">Emergency response &amp; law enforcement</p>
+                            <div class="emergency-number"><i class="fas fa-phone" style="color:var(--accent-red);"></i><span>100</span></div>
                             <div class="emergency-description" id="police-detail">For crimes, accidents, and immediate police assistance.</div>
                         </a>
                         <a href="tel:101" class="emergency-card">
-                            <div class="emergency-icon-wrapper" style="background:linear-gradient(135deg, rgba(210,105,30,0.15), rgba(210,105,30,0.1)); color:var(--accent-orange);"><i class="fas fa-fire-extinguisher"></i></div>
+                            <div class="emergency-icon-wrapper" style="background:linear-gradient(135deg,rgba(210,105,30,0.15),rgba(210,105,30,0.05));color:var(--accent-orange);">
+                                <i class="fas fa-fire-extinguisher"></i>
+                            </div>
                             <h3 id="fire-title">Fire Department</h3>
-                            <p class="subtitle" id="fire-desc">Fire emergencies & rescue operations</p>
-                            <div class="emergency-number"><i class="fas fa-phone"></i><span>101</span></div>
+                            <p class="subtitle" id="fire-desc">Fire emergencies &amp; rescue operations</p>
+                            <div class="emergency-number"><i class="fas fa-phone" style="color:var(--accent-orange);"></i><span>101</span></div>
                             <div class="emergency-description" id="fire-detail">For fire incidents, gas leaks, building collapses, and rescues.</div>
                         </a>
                         <a href="tel:102" class="emergency-card">
-                            <div class="emergency-icon-wrapper" style="background:linear-gradient(135deg, rgba(56,161,105,0.15), rgba(56,161,105,0.1)); color:var(--accent-green);"><i class="fas fa-ambulance"></i></div>
+                            <div class="emergency-icon-wrapper" style="background:linear-gradient(135deg,rgba(56,161,105,0.15),rgba(56,161,105,0.05));color:var(--accent-green);">
+                                <i class="fas fa-ambulance"></i>
+                            </div>
                             <h3 id="ambulance-title">Ambulance</h3>
-                            <p class="subtitle" id="ambulance-desc">Medical emergencies & patient transport</p>
-                            <div class="emergency-number"><i class="fas fa-phone"></i><span>102</span></div>
+                            <p class="subtitle" id="ambulance-desc">Medical emergencies &amp; patient transport</p>
+                            <div class="emergency-number"><i class="fas fa-phone" style="color:var(--accent-green);"></i><span>102</span></div>
                             <div class="emergency-description" id="ambulance-detail">For medical emergencies, accidents, and health crises.</div>
                         </a>
                         <a href="tel:1133" class="emergency-card">
-                            <div class="emergency-icon-wrapper" style="background:linear-gradient(135deg, rgba(49,130,206,0.15), rgba(49,130,206,0.1)); color:var(--accent-blue);"><i class="fas fa-life-ring"></i></div>
+                            <div class="emergency-icon-wrapper" style="background:linear-gradient(135deg,rgba(49,130,206,0.15),rgba(49,130,206,0.05));color:var(--accent-blue);">
+                                <i class="fas fa-life-ring"></i>
+                            </div>
                             <h3 id="disaster-title">Disaster Helpline</h3>
                             <p class="subtitle" id="disaster-desc">Natural disaster emergencies</p>
-                            <div class="emergency-number"><i class="fas fa-phone"></i><span>1133</span></div>
+                            <div class="emergency-number"><i class="fas fa-phone" style="color:var(--accent-blue);"></i><span>1133</span></div>
                             <div class="emergency-description" id="disaster-detail">For earthquake, flood, landslide reports and coordination.</div>
                         </a>
                     </div>
@@ -240,56 +286,58 @@
             </div>
         </div>
 
-        <!-- About Us Tab (Aayushman now UI/UX Designer) -->
+        <!-- ════════════════════════════ ABOUT TAB ════════════════════════════ -->
         <div id="about" class="tab-content">
             <div class="container">
                 <div class="section-card">
                     <h2 class="section-title" id="about-title">About Us</h2>
                     <div class="content-text" id="about-text">
-                        <p>HazardGuard is developed by a dedicated team of students passionate about disaster awareness and community safety in Nepal.</p>
+                        <p>HazardGuard is developed by a dedicated team of students passionate about disaster
+                        awareness and community safety in Nepal.</p>
                     </div>
                     <div class="team-grid">
-                        <!-- Samrat Singh Dhami (Lead Developer) -->
                         <div class="team-member">
                             <div class="member-avatar">
-                                <img src="images/samrat.jpg" alt="Samrat Singh Dhami"
-                                     onerror="this.onerror=null; this.parentElement.innerHTML='<span>SD</span>';">
+                                <img src="https://scontent.fktm20-1.fna.fbcdn.net/v/t39.30808-6/491916700_552959374501025_1482130836924941837_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=53a332&_nc_ohc=f2MA38SeGh4Q7kNvwF9mja5&_nc_oc=AdmRG4UmgXpmvKKGM2EKZLjPYBLPGrszuQvfIaBV2e1PZgWta2qt9gVGBLWJahMZy1iNXTyy1_cMeBHAjK0gpxJm&_nc_zt=23&_nc_ht=scontent.fktm20-1.fna&_nc_gid=z_N_UZvNyZjOQrJM6zAViQ&oh=00_Afs8QnZxhCV2Kov7pS3vIbhRF_GKUDEm9bV8G2pvlVvkWw&oe=69A0C760"
+                                     alt="Samrat Singh Dhami"
+                                     onerror="this.onerror=null;this.parentElement.innerHTML='<span>SD</span>';">
                             </div>
                             <h3 class="member-name">Samrat Singh Dhami</h3>
                             <div class="member-role" id="samrat-role">Lead Developer</div>
                             <p class="member-description" id="samrat-desc">Lead programmer and architect behind HazardGuard's functionality and data systems.</p>
                         </div>
-                        
-                        <!-- Aayushman Malla (UI/UX Designer) -->
                         <div class="team-member">
                             <div class="member-avatar">
-                                <img src="images/aayushman.jpg" alt="Aayushman Malla"
-                                     onerror="this.onerror=null; this.parentElement.innerHTML='<span>AM</span>';">
+                                <img src="https://scontent.fktm20-1.fna.fbcdn.net/v/t39.30808-6/474533607_1151374456548857_4670506718907057055_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=7b2446&_nc_ohc=sz_OT-TwsJ0Q7kNvwEJbtbG&_nc_oc=AdmqwS4T2XkbeA1b4xE_W6Gm0lTcAC45HWorkSRhGVwjkhmpRX0RWCjsi1uJwIMUY5jaZZHQOJSUnpBhvXzpPQRK&_nc_zt=23&_nc_ht=scontent.fktm20-1.fna&_nc_gid=-PUnUYiXFWpOD6XTH4QvWQ&oh=00_Afu-pXs76_Y2Z9xEbuL_48PtUFj7FY6TSkW-KMSwg7ojOg&oe=69A0DB14"
+                                     alt="Aayushman Malla"
+                                     onerror="this.onerror=null;this.parentElement.innerHTML='<span>AM</span>';">
                             </div>
                             <h3 class="member-name">Aayushman Malla</h3>
                             <div class="member-role" id="aayushman-role">UI/UX Designer</div>
                             <p class="member-description" id="aayushman-desc">Designed the user interface and experience to ensure intuitive navigation and accessibility.</p>
                         </div>
-                        
-                        <!-- Digant Gautam Removed -->
                     </div>
                 </div>
             </div>
         </div>
+
     </main>
 
-    <!-- Alert Modal -->
+    <!-- ── ALERT MODAL ── -->
     <div class="alert-modal" id="alert-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-title"><i class="fas fa-exclamation-triangle" id="modal-icon"></i><span id="modal-title">Alert Details</span></div>
+                <div class="modal-title">
+                    <i class="fas fa-exclamation-triangle" id="modal-icon"></i>
+                    <span id="modal-title">Alert Details</span>
+                </div>
                 <button class="modal-close" id="modal-close">&times;</button>
             </div>
             <div class="modal-body">
                 <div id="modal-risk-level" class="risk-level-badge"></div>
-                <h3 id="modal-alert-title"></h3>
-                <p id="modal-description"></p>
-                <h4 id="preparedness-title"><i class="fas fa-clipboard-list"></i> Preparedness Actions</h4>
+                <h3 id="modal-alert-title" style="margin-bottom:10px;"></h3>
+                <p  id="modal-description" style="color:var(--text-secondary);margin-bottom:16px;"></p>
+                <h4 id="preparedness-title" style="margin-bottom:10px;"><i class="fas fa-clipboard-list"></i> Preparedness Actions</h4>
                 <ul class="preparedness-list" id="preparedness-list"></ul>
                 <div class="modal-note">
                     <p><i class="fas fa-info-circle"></i> <strong id="note-label">Note:</strong></p>
@@ -299,18 +347,34 @@
         </div>
     </div>
 
-    <!-- Chatbot -->
+    <!-- ── CHATBOT ── -->
     <div class="chatbot-icon" id="chatbot-icon"><i class="fas fa-robot"></i></div>
     <div class="chatbot-window" id="chatbot-window">
         <div class="chatbot-header">
-            <h4 id="chatbot-title">HazardGuard AI</h4>
+            <div class="chatbot-header-info">
+                <div class="chatbot-avatar"><i class="fas fa-robot"></i></div>
+                <div>
+                    <h4 id="chatbot-title">HazardGuard AI</h4>
+                    <div class="chatbot-header-sub">Powered by GPT-4o • Live Data</div>
+                </div>
+            </div>
             <button class="chatbot-close" id="chatbot-close">&times;</button>
         </div>
         <div class="chatbot-messages" id="chatbot-messages">
-            <div class="message bot-message" id="chatbot-welcome">Hi! I'm your AI assistant. Ask me anything about disasters, weather, or any district in Nepal.</div>
+            <div class="message bot-message" id="chatbot-welcome">
+                🙏 <strong>Namaste! I'm HazardGuard AI.</strong><br>
+                Ask me anything — weather, earthquakes, flood risk, air quality, preparedness tips, or emergency numbers for any district in Nepal.<br><br>
+                <em>I fetch live data to answer your questions.</em>
+            </div>
+        </div>
+        <div class="chatbot-suggestions" id="chatbot-suggestions">
+            <span class="suggestion-chip">⚡ Earthquakes today?</span>
+            <span class="suggestion-chip">🌤️ Weather in Pokhara</span>
+            <span class="suggestion-chip">💨 AQI in Kathmandu</span>
+            <span class="suggestion-chip">🆘 Emergency numbers</span>
         </div>
         <div class="chatbot-input-area">
-            <input type="text" class="chatbot-input" id="chatbot-input" placeholder="Type your question...">
+            <input type="text" class="chatbot-input" id="chatbot-input" placeholder="Ask about any district in Nepal…">
             <button class="chatbot-send" id="chatbot-send"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
@@ -320,15 +384,12 @@
             <div class="footer-content">
                 <h3 id="footer-title">HazardGuard Nepal</h3>
                 <p id="footer-text">A disaster awareness and preparedness platform designed to enhance community safety through education, real-time information, and emergency resources.</p>
-                <p id="footer-copyright">© 2024 HazardGuard | Educational Project | Real-time data from OpenWeatherMap, IQAir, USGS</p>
+                <p id="footer-copyright">© 2025 HazardGuard | Data: OpenWeatherMap · Open-Meteo · USGS · OpenAI GPT-4o</p>
             </div>
         </div>
     </footer>
 
-    <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
-    <!-- Custom JS -->
-    <script src="js/script.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
