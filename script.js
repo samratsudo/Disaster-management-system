@@ -1,811 +1,578 @@
-// Service Worker for offline support (optional - requires HTTPS)
-if ('serviceWorker' in navigator && window.location.protocol !== 'file:') {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-            .then(() => console.log('✅ Offline mode enabled'))
-            .catch(() => console.log('ℹ️ Offline mode unavailable (use HTTP server)'));
+// ========== LANGUAGE TRANSLATIONS ==========
+const translations = {
+    en: {
+        'nav-home': 'Home',
+        'nav-mapping': 'Mapping',
+        'nav-disaster': 'Disaster Alert',
+        'nav-emergency': 'Emergency',
+        'nav-about': 'About Us',
+        'hero-title': 'HazardGuard',
+        'hero-subtitle': 'HazardGuard is a disaster awareness and preparedness website that helps people learn about natural hazards like earthquakes, floods, and landslides in Nepal and provides real‑time alerts and emergency contact information to stay safe.',
+        'discover-btn': 'Discover',
+        'home-title': 'Understanding Disaster Risks in Nepal',
+        'home-text1': 'Natural disasters in Nepal occur unexpectedly and can cause severe damage to communities. The country\'s diverse geography makes it vulnerable to various hazards that threaten lives and property. Early warning systems and public awareness are crucial for reducing disaster risks. Timely alerts allow communities to prepare, evacuate if necessary, and minimize casualties.',
+        'checklist-title': 'Quick Preparedness Checklist',
+        'check1-label': 'Create a family emergency plan with meeting points',
+        'check2-label': 'Prepare a 3-day emergency supply kit',
+        'check3-label': 'Know your nearest emergency shelter location',
+        'mapping-title': 'Nepal Disaster & Environmental Risk Visualization',
+        'mapping-text': 'Visual representation of disaster-prone areas across Nepal. Select different layers to see specific risk types. Click on any location marker to see its weather information.',
+        'weather-humidity-label': 'Humidity',
+        'weather-wind-label': 'Wind Speed',
+        'weather-feels-label': 'Feels Like',
+        'map-title': 'Interactive Risk Map',
+        'map-all': 'All Risks',
+        'map-earthquake': 'Earthquakes',
+        'map-flood': 'Flood Risk',
+        'map-landslide': 'Landslides',
+        'legend-title': 'Risk Level Legend',
+        'legend-high': 'High Risk',
+        'legend-medium': 'Medium Risk',
+        'legend-low': 'Low Risk',
+        'alert-title': 'Real-time Disaster Alert System',
+        'alert-text': 'Get real-time alerts and environmental data for your selected district. Click on any alert card to see specific preparedness actions.',
+        'location-status': 'Select your district or use your current location',
+        'use-location': 'Use My Location',
+        'see-other': 'Wanna see other?',
+        'select-district': '-- Select Your District --',
+        'get-alerts': 'Get Alerts',
+        'air-title': 'Air Quality',
+        'status-label': 'Status',
+        'pm-label': 'PM2.5',
+        'location-label': 'Location',
+        'updated-label': 'Updated',
+        'flood-title': 'Flood Alert',
+        'flood-status-label': 'Status',
+        'river-label': 'River',
+        'danger-label': 'Danger Level',
+        'flood-updated-label': 'Updated',
+        'refresh-text': 'Refresh Real-time Data',
+        'emergency-title': 'Emergency Contacts',
+        'emergency-subtitle': 'Click any number to call immediately from your device.',
+        'police-title': 'Police',
+        'police-desc': 'Emergency response & law enforcement',
+        'police-detail': 'For crimes, accidents, and immediate police assistance.',
+        'fire-title': 'Fire Department',
+        'fire-desc': 'Fire emergencies & rescue operations',
+        'fire-detail': 'For fire incidents, gas leaks, building collapses, and rescues.',
+        'ambulance-title': 'Ambulance',
+        'ambulance-desc': 'Medical emergencies & patient transport',
+        'ambulance-detail': 'For medical emergencies, accidents, and health crises.',
+        'disaster-title': 'Disaster Helpline',
+        'disaster-desc': 'Natural disaster emergencies',
+        'disaster-detail': 'For earthquake, flood, landslide reports and coordination.',
+        'about-title': 'About Us',
+        'about-text': 'HazardGuard is developed by a dedicated team of students passionate about disaster awareness and community safety in Nepal.',
+        'samrat-role': 'Lead Developer',
+        'samrat-desc': 'Lead programmer and architect behind HazardGuard\'s functionality and data systems.',
+        'aayushman-role': 'UI/UX Designer',
+        'aayushman-desc': 'Designed the user interface and experience to ensure intuitive navigation and accessibility.',
+        'chatbot-title': 'HazardGuard AI',
+        'chatbot-welcome': 'Hi! I\'m your AI assistant. Ask me anything about disasters, weather, or any district in Nepal.',
+        'chatbot-input-placeholder': 'Type your question...',
+        'footer-title': 'HazardGuard Nepal',
+        'footer-text': 'A disaster awareness and preparedness platform designed to enhance community safety through education, real-time information, and emergency resources.',
+        'footer-copyright': '© 2024 HazardGuard | Educational Project | Real-time data from OpenWeatherMap, IQAir, USGS'
+    },
+    np: {
+        'nav-home': 'गृहपृष्ठ',
+        'nav-mapping': 'नक्सांकन',
+        'nav-disaster': 'प्रकोप चेतावनी',
+        'nav-emergency': 'आपतकालीन',
+        'nav-about': 'हाम्रो बारेमा',
+        'hero-title': 'हजार्डगार्ड',
+        'hero-subtitle': 'हजार्डगार्ड एक प्रकोप जागरूकता र तयारी वेबसाइट हो जसले मानिसहरूलाई नेपालमा भूकम्प, बाढी र पहिरो जस्ता प्राकृतिक प्रकोपहरूको बारेमा जान्न मद्दत गर्दछ र सुरक्षित रहन वास्तविक-समय चेतावनी र आपतकालीन सम्पर्क जानकारी प्रदान गर्दछ।',
+        'discover-btn': 'पत्ता लगाउनुहोस्',
+        'home-title': 'नेपालमा प्रकोप जोखिम बुझ्दै',
+        'home-text1': 'नेपालमा प्राकृतिक प्रकोप अप्रत्याशित रूपमा हुन्छन् र समुदायहरूलाई गम्भीर क्षति पुर्याउन सक्छन्। देशको विविध भौगोलिक अवस्थाले यसलाई विभिन्न खतराहरूको लागि संवेदनशील बनाउँछ जसले जीवन र सम्पत्तिलाई खतरामा पार्छ। प्रारम्भिक चेतावनी प्रणाली र सार्वजनिक जागरूकता प्रकोप जोखिम कम गर्नको लागि महत्वपूर्ण छन्। समयमै चेतावनीले समुदायहरूलाई तयारी गर्न, आवश्यक परेमा खाली गर्न र हताहती कम गर्न अनुमति दिन्छ।',
+        'checklist-title': 'द्रुत तयारी चेकलिस्ट',
+        'check1-label': 'बैठक बिन्दुहरू सहित परिवार आपतकालीन योजना बनाउनुहोस्',
+        'check2-label': '३-दिने आपतकालीन आपूर्ति किट तयार गर्नुहोस्',
+        'check3-label': 'आफ्नो नजिकको आपतकालीन आश्रय स्थान थाहा पाउनुहोस्',
+        'mapping-title': 'नेपाल प्रकोप र वातावरणीय जोखिम भिजुअलाइजेसन',
+        'mapping-text': 'नेपाल भर प्रकोप-प्रवण क्षेत्रहरूको दृश्य प्रतिनिधित्व। विशिष्ट जोखिम प्रकारहरू हेर्न विभिन्न तहहरू चयन गर्नुहोस्। यसको मौसम जानकारी हेर्न कुनै पनि स्थान मार्करमा क्लिक गर्नुहोस्।',
+        'weather-humidity-label': 'आर्द्रता',
+        'weather-wind-label': 'हावाको गति',
+        'weather-feels-label': 'जस्तो लाग्छ',
+        'map-title': 'अन्तरक्रियात्मक जोखिम नक्सा',
+        'map-all': 'सबै जोखिम',
+        'map-earthquake': 'भूकम्प',
+        'map-flood': 'बाढी जोखिम',
+        'map-landslide': 'पहिरो',
+        'legend-title': 'जोखिम स्तर व्याख्या',
+        'legend-high': 'उच्च जोखिम',
+        'legend-medium': 'मध्यम जोखिम',
+        'legend-low': 'कम जोखिम',
+        'alert-title': 'वास्तविक-समय प्रकोप चेतावनी प्रणाली',
+        'alert-text': 'तपाईंको चयन गरिएको जिल्लाको लागि वास्तविक-समय चेतावनी र वातावरणीय डाटा प्राप्त गर्नुहोस्। विशिष्ट तयारी कार्यहरू हेर्न कुनै पनि चेतावनी कार्डमा क्लिक गर्नुहोस्।',
+        'location-status': 'तपाईंको जिल्ला चयन गर्नुहोस् वा तपाईंको हालको स्थान प्रयोग गर्नुहोस्',
+        'use-location': 'मेरो स्थान प्रयोग गर्नुहोस्',
+        'see-other': 'अरू हेर्न चाहनुहुन्छ?',
+        'select-district': '-- तपाईंको जिल्ला चयन गर्नुहोस् --',
+        'get-alerts': 'चेतावनी प्राप्त गर्नुहोस्',
+        'air-title': 'वायु गुणस्तर',
+        'status-label': 'स्थिति',
+        'pm-label': 'PM2.5',
+        'location-label': 'स्थान',
+        'updated-label': 'अद्यावधिक',
+        'flood-title': 'बाढी चेतावनी',
+        'flood-status-label': 'स्थिति',
+        'river-label': 'नदी',
+        'danger-label': 'खतरा स्तर',
+        'flood-updated-label': 'अद्यावधिक',
+        'refresh-text': 'वास्तविक-समय डाटा ताजा गर्नुहोस्',
+        'emergency-title': 'आपतकालीन सम्पर्कहरू',
+        'emergency-subtitle': 'तपाईंको उपकरणबाट तुरुन्तै कल गर्न कुनै पनि नम्बरमा क्लिक गर्नुहोस्।',
+        'police-title': 'प्रहरी',
+        'police-desc': 'आपतकालीन प्रतिक्रिया र कानून प्रवर्तन',
+        'police-detail': 'अपराध, दुर्घटना र तत्काल प्रहरी सहायताको लागि।',
+        'fire-title': 'दमकल विभाग',
+        'fire-desc': 'आगो आपतकालीन र उद्धार कार्य',
+        'fire-detail': 'आगो घटना, ग्यास चुहावट, भवन भत्किएको र उद्धारको लागि।',
+        'ambulance-title': 'एम्बुलेन्स',
+        'ambulance-desc': 'चिकित्सा आपतकालीन र बिरामी ढुवानी',
+        'ambulance-detail': 'चिकित्सा आपतकालीन, दुर्घटना र स्वास्थ्य संकटको लागि।',
+        'disaster-title': 'प्रकोप हेल्पलाइन',
+        'disaster-desc': 'प्राकृतिक प्रकोप आपतकालीन',
+        'disaster-detail': 'भूकम्प, बाढी, पहिरो रिपोर्ट र समन्वयको लागि।',
+        'about-title': 'हाम्रो बारेमा',
+        'about-text': 'हजार्डगार्ड नेपालमा प्रकोप जागरूकता र सामुदायिक सुरक्षाको बारेमा भावुक विद्यार्थीहरूको समर्पित टोलीद्वारा विकसित गरिएको हो।',
+        'samrat-role': 'प्रमुख विकासकर्ता',
+        'samrat-desc': 'हजार्डगार्डको कार्यक्षमता र डाटा प्रणाली पछाडि प्रमुख प्रोग्रामर र आर्किटेक्ट।',
+        'aayushman-role': 'UI/UX डिजाइनर',
+        'aayushman-desc': 'सहज नेभिगेसन र पहुँच सुनिश्चित गर्न प्रयोगकर्ता इन्टरफेस र अनुभव डिजाइन गरे।',
+        'chatbot-title': 'हजार्डगार्ड एआई',
+        'chatbot-welcome': 'नमस्ते! म तपाईंको एआई सहायक हुँ। मलाई प्रकोप, मौसम वा नेपालको कुनै पनि जिल्लाको बारेमा सोध्नुहोस्।',
+        'chatbot-input-placeholder': 'तपाईंको प्रश्न टाइप गर्नुहोस्...',
+        'footer-title': 'हजार्डगार्ड नेपाल',
+        'footer-text': 'शिक्षा, वास्तविक-समय जानकारी र आपतकालीन स्रोतहरू मार्फत सामुदायिक सुरक्षा बढाउन डिजाइन गरिएको प्रकोप जागरूकता र तयारी प्लेटफर्म।',
+        'footer-copyright': '© २०२४ हजार्डगार्ड | शैक्षिक परियोजना | वास्तविक-समय डाटा OpenWeatherMap, IQAir, USGS बाट'
+    }
+};
+
+// ========== LANGUAGE TOGGLE FUNCTION ==========
+function setLanguage(lang) {
+    const elements = document.querySelectorAll('[id]');
+    elements.forEach(el => {
+        const id = el.id;
+        if (translations[lang] && translations[lang][id]) {
+            if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                el.placeholder = translations[lang][id];
+            } else if (el.tagName === 'OPTION') {
+                el.textContent = translations[lang][id];
+            } else {
+                el.innerHTML = translations[lang][id];
+            }
+        }
     });
+    
+    // Update active language label
+    document.getElementById('lang-en').classList.toggle('active', lang === 'en');
+    document.getElementById('lang-np').classList.toggle('active', lang === 'np');
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Tab switching functionality
-    const tabButtons = document.querySelectorAll('.floating-nav button, .discover-btn');
-    const tabContents = document.querySelectorAll('.tab-content');
+// Initialize language toggle
+document.addEventListener('DOMContentLoaded', () => {
+    const langSwitch = document.getElementById('lang-switch');
     
-    function switchTab(tabId) {
-        // Update floating nav buttons
-        document.querySelectorAll('.floating-nav button').forEach(btn => {
-            btn.classList.remove('active');
-            if (btn.getAttribute('data-tab') === tabId) {
-                btn.classList.add('active');
-            }
-        });
-        
-        // Update tab contents
-        tabContents.forEach(content => {
-            content.classList.remove('active');
-            if (content.id === tabId) {
-                content.classList.add('active');
-            }
-        });
-        
-        // Initialize map when mapping tab is opened
-        if (tabId === 'mapping' && window.map === undefined) {
-            setTimeout(initializeMap, 100);
-        }
-        
-        // Scroll to top
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Set initial language (English)
+    setLanguage('en');
+    
+    // Add event listener
+    langSwitch.addEventListener('change', (e) => {
+        const lang = e.target.checked ? 'np' : 'en';
+        setLanguage(lang);
+    });
+});
+
+// ========== API KEYS ==========
+const WEATHER_API_KEY = 'b0b72746fb74ffb6a3040761cbee2db7';
+const AIR_QUALITY_API_KEY = 'd8bb3306-d1a6-4700-9baa-853f5b773af1';
+const FLOOD_API_KEY = '55b6f1a6-627d-4876-abc1-8c25553643de';
+const EARTHQUAKE_API_KEY = 'A7P79EnubyYXLwz2eCMAnSSH9TJbi7EsMndMLkrJ';
+const OPENAI_API_KEY = xxxxxxx
+const CORS_PROXY = 'https://corsproxy.io/?';
+
+let currentDistrict = 'Kathmandu';
+let map = null;
+
+// District risk data (simplified for demo – expand as needed)
+const districtRiskData = {
+    'kathmandu': { earthquake: 'high', flood: 'low', landslide: 'medium' },
+    'bhaktapur': { earthquake: 'high', flood: 'low', landslide: 'medium' },
+    'lalitpur': { earthquake: 'high', flood: 'low', landslide: 'medium' },
+    'pokhara': { earthquake: 'medium', flood: 'low', landslide: 'high' },
+    'biratnagar': { earthquake: 'low', flood: 'high', landslide: 'low' },
+    'default': { earthquake: 'medium', flood: 'medium', landslide: 'medium' }
+};
+
+const preparednessData = {
+    earthquake: {
+        high: { title: 'Earthquake Alert - High Risk', icon: 'fas fa-bolt', alertTitle: 'Immediate Action Required', description: 'Major seismic activity possible.', riskLevel: 'HIGH RISK', riskColor: '#ef4444', preparedness: ['Drop, Cover, and Hold On', 'Secure heavy furniture', 'Prepare go-bag'], note: 'During shaking: Drop to hands and knees, Cover head.' },
+        medium: { title: 'Earthquake Alert - Medium Risk', icon: 'fas fa-bolt', alertTitle: 'Stay Prepared', description: 'Moderate earthquake risk.', riskLevel: 'MEDIUM RISK', riskColor: '#f59e0b', preparedness: ['Prepare emergency kit', 'Secure tall furniture'], note: 'Check your home for hazards.' },
+        low: { title: 'Earthquake Alert - Low Risk', icon: 'fas fa-bolt', alertTitle: 'Basic Preparedness', description: 'Low earthquake risk.', riskLevel: 'LOW RISK', riskColor: '#10b981', preparedness: ['Keep basic supplies', 'Learn first aid'], note: 'Earthquakes can occur anywhere.' }
+    },
+    flood: {
+        high: { title: 'Flood Alert - High Risk', icon: 'fas fa-water', alertTitle: 'Immediate Evacuation', description: 'River levels above danger.', riskLevel: 'HIGH RISK', riskColor: '#ef4444', preparedness: ['Move to higher ground', 'Turn off utilities'], note: 'Never walk through flood water.' },
+        medium: { title: 'Flood Alert - Medium Risk', icon: 'fas fa-water', alertTitle: 'Prepare for Flooding', description: 'Moderate flood risk.', riskLevel: 'MEDIUM RISK', riskColor: '#f59e0b', preparedness: ['Prepare sandbags', 'Clear drains'], note: 'Monitor river levels.' },
+        low: { title: 'Flood Alert - Low Risk', icon: 'fas fa-water', alertTitle: 'Monitor Conditions', description: 'Low flood risk.', riskLevel: 'LOW RISK', riskColor: '#10b981', preparedness: ['Keep drainage clear', 'Know evacuation routes'], note: 'Flash floods possible.' }
+    },
+    landslide: {
+        high: { title: 'Landslide Alert - High Risk', icon: 'fas fa-layer-group', alertTitle: 'Extreme Danger', description: 'Extreme risk of landslides.', riskLevel: 'HIGH RISK', riskColor: '#ef4444', preparedness: ['Evacuate hillsides', 'Listen for unusual sounds'], note: 'Move diagonally across slope.' },
+        medium: { title: 'Landslide Alert - Medium Risk', icon: 'fas fa-layer-group', alertTitle: 'Exercise Caution', description: 'Moderate landslide risk.', riskLevel: 'MEDIUM RISK', riskColor: '#f59e0b', preparedness: ['Avoid steep slopes', 'Watch for cracks'], note: 'Be cautious after heavy rain.' },
+        low: { title: 'Landslide Alert - Low Risk', icon: 'fas fa-layer-group', alertTitle: 'Stay Vigilant', description: 'Low landslide risk.', riskLevel: 'LOW RISK', riskColor: '#10b981', preparedness: ['Avoid steep cuts', 'Report instability'], note: 'Even low-risk areas can slide.' }
     }
-    
-    // Add click handlers to floating nav buttons
-    document.querySelectorAll('.floating-nav button').forEach(button => {
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            switchTab(this.getAttribute('data-tab'));
-        });
-    });
-    
-    // Discover button handler
-    document.querySelector('.discover-btn').addEventListener('click', function(e) {
-        e.preventDefault();
-        switchTab(this.getAttribute('data-tab'));
-    });
-    
-    // NEW: Real-time data refresh button
-    const refreshBtn = document.getElementById('refresh-realtime-data');
-    refreshBtn.addEventListener('click', function() {
-        refreshBtn.classList.add('updating');
-        refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
-        
-        // Update all real-time data
-        updateAirQualityData();
-        updateFloodAlertData();
-        updateWeatherData();
-        
-        setTimeout(() => {
-            refreshBtn.classList.remove('updating');
-            refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Real-time Data';
-        }, 1500);
-    });
-    
-    // NEW: Modal functionality
-    const alertModal = document.getElementById('alert-modal');
-    const modalClose = document.getElementById('modal-close');
-    
-    modalClose.addEventListener('click', function() {
-        alertModal.style.display = 'none';
-    });
-    
-    alertModal.addEventListener('click', function(e) {
-        if (e.target === alertModal) {
-            alertModal.style.display = 'none';
+};
+
+const allDistricts = {
+    "Bagmati": ["Kathmandu", "Bhaktapur", "Lalitpur"]
+};
+
+async function fetchWeather(city) {
+    try {
+        const url = `https://api.openweathermap.org/data/2.5/weather?q=${city},np&units=metric&appid=${WEATHER_API_KEY}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.cod === 200) {
+            return {
+                temp: Math.round(data.main.temp),
+                condition: data.weather[0].description,
+                humidity: data.main.humidity,
+                wind: data.wind.speed,
+                feelsLike: Math.round(data.main.feels_like),
+                icon: getWeatherIcon(data.weather[0].icon)
+            };
         }
-    });
-    
-    // NEW: Preparedness data with more practical and useful tips
-    const preparednessData = {
-        'earthquake': {
-            high: {
-                title: 'Earthquake Alert - High Risk',
-                icon: 'fas fa-bolt',
-                alertTitle: 'Immediate Action Required',
-                description: 'Your area is in a high-risk earthquake zone. Major seismic activity is possible.',
-                riskLevel: 'HIGH RISK',
-                riskColor: '#ef4444',
-                preparedness: [
-                    'Store emergency water (4 liters per person per day for 3 days)',
-                    'Secure heavy furniture like cabinets, shelves, and water heaters to walls',
-                    'Prepare "go-bag" with first aid, flashlight, batteries, whistle, and documents',
-                    'Identify safe spots in every room (under sturdy tables, against interior walls)',
-                    'Practice "Drop, Cover, and Hold On" drill with family monthly',
-                    'Know how to shut off gas, water, and electricity mains'
-                ],
-                note: 'During shaking: Drop to hands and knees, Cover head under table, Hold on until shaking stops.'
-            },
-            medium: {
-                title: 'Earthquake Alert - Medium Risk',
-                icon: 'fas fa-bolt',
-                alertTitle: 'Stay Prepared and Vigilant',
-                description: 'Your area has moderate earthquake risk. Stay informed and prepared.',
-                riskLevel: 'MEDIUM RISK',
-                riskColor: '#f59e0b',
-                preparedness: [
-                    'Prepare 3-day emergency kit with water, food, medicine, and cash',
-                    'Secure tall furniture that could topple during shaking',
-                    'Have fire extinguishers and know how to use them',
-                    'Create family emergency plan with meeting points',
-                    'Keep shoes and flashlight beside bed for night emergencies',
-                    'Participate in community earthquake drills'
-                ],
-                note: 'Check your home for hazards: loose shelves, hanging objects, poor building materials.'
-            },
-            low: {
-                title: 'Earthquake Alert - Low Risk',
-                icon: 'fas fa-bolt',
-                alertTitle: 'Maintain Basic Preparedness',
-                description: 'Your area has low earthquake risk. Maintain basic preparedness.',
-                riskLevel: 'LOW RISK',
-                riskColor: '#10b981',
-                preparedness: [
-                    'Keep basic emergency supplies: water, non-perishable food, first aid',
-                    'Learn basic first aid and CPR techniques',
-                    'Keep emergency contact numbers in phone and wallet',
-                    'Review earthquake safety procedures every 6 months',
-                    'Ensure your home insurance covers earthquake damage',
-                    'Stay informed about seismic activity through official channels'
-                ],
-                note: 'While risk is low, earthquakes can occur anywhere without warning.'
-            }
-        },
-        'flood': {
-            high: {
-                title: 'Flood Alert - High Risk',
-                icon: 'fas fa-water',
-                alertTitle: 'Immediate Evacuation May Be Required',
-                description: 'Your area is at high risk of flooding. River levels are above danger threshold.',
-                riskLevel: 'HIGH RISK',
-                riskColor: '#ef4444',
-                preparedness: [
-                    'Move to higher ground immediately if advised by authorities',
-                    'Prepare emergency bag with medicines, documents, phone charger, cash',
-                    'Turn off electricity, gas, and water mains before evacuating',
-                    'Move valuables and electronics to upper floors',
-                    'Fill bathtubs and containers with clean drinking water',
-                    'Never walk or drive through flood waters (15cm can sweep you away)'
-                ],
-                note: 'Stay tuned to local radio for evacuation orders. Do not return until authorities say it\'s safe.'
-            },
-            medium: {
-                title: 'Flood Alert - Medium Risk',
-                icon: 'fas fa-water',
-                alertTitle: 'Prepare for Possible Flooding',
-                description: 'Your area has moderate flood risk. Monitor weather conditions closely.',
-                riskLevel: 'MEDIUM RISK',
-                riskColor: '#f59e0b',
-                preparedness: [
-                    'Prepare sandbags for doorways and low openings',
-                    'Clear gutters, drains, and drainage channels',
-                    'Move important items to higher shelves or upper floors',
-                    'Prepare emergency supplies for 3-5 days',
-                    'Identify safe evacuation routes to higher ground',
-                    'Charge phones and power banks, keep radio batteries ready'
-                ],
-                note: 'Monitor river levels during monsoon. Be ready to evacuate if water rises rapidly.'
-            },
-            low: {
-                title: 'Flood Alert - Low Risk',
-                icon: 'fas fa-water',
-                alertTitle: 'Monitor Conditions During Monsoon',
-                description: 'Your area has low flood risk. Stay informed about weather changes.',
-                riskLevel: 'LOW RISK',
-                riskColor: '#10b981',
-                preparedness: [
-                    'Keep drainage systems clear of debris',
-                    'Have emergency contact numbers saved in phone',
-                    'Monitor river levels and weather forecasts during monsoon',
-                    'Prepare basic emergency kit with flashlight, radio, first aid',
-                    'Know location of nearest evacuation shelters',
-                    'Check weather forecasts 2-3 times daily during rainy season'
-                ],
-                note: 'Low risk areas can still experience flash floods during heavy rainfall.'
-            }
-        },
-        'landslide': {
-            high: {
-                title: 'Landslide Alert - High Risk',
-                icon: 'fas fa-layer-group',
-                alertTitle: 'Extreme Danger - Avoid Hillsides',
-                description: 'Your area is at extreme risk of landslides due to terrain and rainfall.',
-                riskLevel: 'HIGH RISK',
-                riskColor: '#ef4444',
-                preparedness: [
-                    'Evacuate immediately if in landslide-prone area during heavy rain',
-                    'Avoid all hillside roads, paths, and unstable slopes',
-                    'Listen for unusual sounds (trees cracking, boulders knocking)',
-                    'Watch for signs: new cracks in ground, tilting trees, bulging ground',
-                    'Move to stable ground away from base of slopes',
-                    'Do not return until authorities declare area safe'
-                ],
-                note: 'Landslides can occur suddenly with little warning. Move diagonally across slope if caught in one.'
-            },
-            medium: {
-                title: 'Landslide Alert - Medium Risk',
-                icon: 'fas fa-layer-group',
-                alertTitle: 'Exercise Caution on Slopes',
-                description: 'Your area has moderate landslide risk. Avoid unstable slopes.',
-                riskLevel: 'MEDIUM RISK',
-                riskColor: '#f59e0b',
-                preparedness: [
-                    'Avoid hillside areas during and after heavy rainfall',
-                    'Watch for signs of soil movement or small slides',
-                    'Stay informed about rainfall forecasts and warnings',
-                    'Identify safe evacuation routes away from slopes',
-                    'Keep emergency supplies ready for quick evacuation',
-                    'Report any slope cracks or erosion to local authorities'
-                ],
-                note: 'Be particularly cautious after prolonged rainfall when soil is saturated.'
-            },
-            low: {
-                title: 'Landslide Alert - Low Risk',
-                icon: 'fas fa-layer-group',
-                alertTitle: 'Stay Vigilant in Hilly Areas',
-                description: 'Your area has low landslide risk. Basic precautions recommended.',
-                riskLevel: 'LOW RISK',
-                riskColor: '#10b981',
-                preparedness: [
-                    'Avoid steep slopes and cuttings during heavy rain',
-                    'Monitor weather conditions during monsoon season',
-                    'Know signs of potential landslides: tilted poles, cracks',
-                    'Have emergency contact numbers for local disaster management',
-                    'Stay on established trails in hilly areas',
-                    'Report any slope instability or erosion to authorities'
-                ],
-                note: 'Even low-risk areas can experience landslides during extreme weather.'
-            }
+    } catch (e) { console.error('Weather fetch error', e); }
+    return null;
+}
+
+function getWeatherIcon(iconCode) {
+    const map = {
+        '01d':'fa-sun','01n':'fa-moon','02d':'fa-cloud-sun','02n':'fa-cloud-moon',
+        '03d':'fa-cloud','03n':'fa-cloud','04d':'fa-cloud','04n':'fa-cloud',
+        '09d':'fa-cloud-rain','09n':'fa-cloud-rain','10d':'fa-cloud-sun-rain','10n':'fa-cloud-moon-rain',
+        '11d':'fa-bolt','11n':'fa-bolt','13d':'fa-snowflake','13n':'fa-snowflake',
+        '50d':'fa-smog','50n':'fa-smog'
+    };
+    return map[iconCode] || 'fa-cloud-sun';
+}
+
+async function fetchAirQuality(city) {
+    try {
+        const url = `https://api.airvisual.com/v2/city?city=${city}&country=Nepal&key=${AIR_QUALITY_API_KEY}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        if (data.status === 'success') {
+            return {
+                aqi: data.data.current.pollution.aqius,
+                pm25: data.data.current.pollution.pm25,
+                level: getAQILevel(data.data.current.pollution.aqius)
+            };
         }
-    };
-    
-    // Function to show alert details modal
-    function showAlertDetails(alertData) {
-        document.getElementById('modal-title').textContent = alertData.title;
-        document.getElementById('modal-icon').className = alertData.icon;
-        document.getElementById('modal-alert-title').textContent = alertData.alertTitle;
-        document.getElementById('modal-description').textContent = alertData.description;
-        document.getElementById('modal-note').textContent = alertData.note;
-        
-        // Set risk level badge
-        const riskLevelElement = document.getElementById('modal-risk-level');
-        riskLevelElement.textContent = alertData.riskLevel;
-        riskLevelElement.style.background = alertData.riskColor;
-        riskLevelElement.style.color = 'white';
-        
-        // Clear and add preparedness items
-        const preparednessList = document.getElementById('preparedness-list');
-        preparednessList.innerHTML = '';
-        
-        alertData.preparedness.forEach(item => {
-            const li = document.createElement('li');
-            li.innerHTML = `<i class="fas fa-check-circle"></i> ${item}`;
-            preparednessList.appendChild(li);
+    } catch (e) { console.error('Air quality fetch error', e); }
+    return null;
+}
+
+function getAQILevel(aqi) {
+    if (aqi <= 50) return 'Good';
+    if (aqi <= 100) return 'Moderate';
+    if (aqi <= 150) return 'Unhealthy for Sensitive';
+    if (aqi <= 200) return 'Unhealthy';
+    if (aqi <= 300) return 'Very Unhealthy';
+    return 'Hazardous';
+}
+
+async function fetchEarthquakes() {
+    try {
+        const url = 'https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_day.geojson';
+        const res = await fetch(url);
+        const data = await res.json();
+        const nepalQuakes = data.features.filter(f => {
+            const [lon, lat] = f.geometry.coordinates;
+            return lat > 26 && lat < 31 && lon > 80 && lon < 89;
         });
-        
-        alertModal.style.display = 'flex';
-    }
-    
-    // Current district tracking
-    let currentDistrict = 'Kathmandu';
-    
-    // District risk database
-    const districtRiskData = {
-        'kathmandu': { earthquake: 'high', flood: 'low', landslide: 'medium' },
-        'pokhara': { earthquake: 'medium', flood: 'low', landslide: 'high' },
-        'biratnagar': { earthquake: 'low', flood: 'high', landslide: 'low' },
-        'nepalgunj': { earthquake: 'low', flood: 'high', landslide: 'low' },
-        'jhapa': { earthquake: 'medium', flood: 'high', landslide: 'low' },
-        'kaski': { earthquake: 'medium', flood: 'low', landslide: 'high' },
-        'saptari': { earthquake: 'low', flood: 'high', landslide: 'low' },
-        'sindhupalchok': { earthquake: 'high', flood: 'medium', landslide: 'high' },
-        'gorkha': { earthquake: 'high', flood: 'medium', landslide: 'high' },
-        'chitwan': { earthquake: 'medium', flood: 'medium', landslide: 'medium' },
-        'default': { earthquake: 'medium', flood: 'medium', landslide: 'medium' }
-    };
-    
-    // District air quality data
-    const airQualityData = {
-        'kathmandu': { aqi: 85, pm25: 42, level: 'Moderate' },
-        'pokhara': { aqi: 45, pm25: 22, level: 'Good' },
-        'biratnagar': { aqi: 132, pm25: 68, level: 'Unhealthy' },
-        'nepalgunj': { aqi: 98, pm25: 48, level: 'Moderate' },
-        'jhapa': { aqi: 65, pm25: 35, level: 'Moderate' },
-        'kaski': { aqi: 40, pm25: 20, level: 'Good' },
-        'saptari': { aqi: 110, pm25: 55, level: 'Unhealthy' },
-        'sindhupalchok': { aqi: 70, pm25: 38, level: 'Moderate' },
-        'default': { aqi: 75, pm25: 35, level: 'Moderate' }
-    };
-    
-    // District flood data
-    const floodData = {
+        return nepalQuakes.map(q => ({
+            mag: q.properties.mag,
+            place: q.properties.place,
+            time: new Date(q.properties.time).toLocaleString()
+        }));
+    } catch (e) { console.error('Earthquake fetch error', e); }
+    return [];
+}
+
+async function fetchFlood(district) {
+    const floodMock = {
         'kathmandu': { level: 3.2, danger: 4.5, status: 'Normal', river: 'Bagmati' },
-        'pokhara': { level: 1.8, danger: 3.0, status: 'Normal', river: 'Seti' },
-        'biratnagar': { level: 5.8, danger: 6.5, status: 'Warning', river: 'Koshi' },
-        'nepalgunj': { level: 4.2, danger: 5.0, status: 'Normal', river: 'Karnali' },
-        'jhapa': { level: 6.1, danger: 7.0, status: 'Warning', river: 'Mechi' },
-        'kaski': { level: 2.5, danger: 4.0, status: 'Normal', river: 'Seti' },
-        'saptari': { level: 7.2, danger: 8.0, status: 'Alert', river: 'Koshi' },
-        'sindhupalchok': { level: 3.8, danger: 6.0, status: 'Normal', river: 'Indrawati' },
+        'bhaktapur': { level: 3.1, danger: 4.3, status: 'Normal', river: 'Bagmati' },
         'default': { level: 3.0, danger: 5.0, status: 'Normal', river: 'Local River' }
     };
-    
-    // District weather data
-    const weatherData = {
-        'kathmandu': { temp: 22, condition: 'Partly Cloudy', humidity: 65, wind: 8, feelsLike: 23, icon: 'fa-cloud-sun' },
-        'pokhara': { temp: 20, condition: 'Light Rain', humidity: 75, wind: 5, feelsLike: 21, icon: 'fa-cloud-rain' },
-        'biratnagar': { temp: 32, condition: 'Hot and Humid', humidity: 70, wind: 12, feelsLike: 35, icon: 'fa-sun' },
-        'nepalgunj': { temp: 30, condition: 'Clear', humidity: 60, wind: 10, feelsLike: 32, icon: 'fa-sun' },
-        'jhapa': { temp: 28, condition: 'Partly Cloudy', humidity: 68, wind: 6, feelsLike: 30, icon: 'fa-cloud-sun' },
-        'kaski': { temp: 20, condition: 'Light Rain', humidity: 80, wind: 4, feelsLike: 21, icon: 'fa-cloud-rain' },
-        'saptari': { temp: 32, condition: 'Hot', humidity: 65, wind: 15, feelsLike: 36, icon: 'fa-sun' },
-        'sindhupalchok': { temp: 18, condition: 'Cool', humidity: 70, wind: 7, feelsLike: 19, icon: 'fa-cloud' },
-        'gorkha': { temp: 21, condition: 'Partly Cloudy', humidity: 72, wind: 6, feelsLike: 22, icon: 'fa-cloud-sun' },
-        'chitwan': { temp: 26, condition: 'Clear', humidity: 65, wind: 8, feelsLike: 28, icon: 'fa-sun' },
-        'default': { temp: 25, condition: 'Partly Cloudy', humidity: 65, wind: 8, feelsLike: 26, icon: 'fa-cloud-sun' }
-    };
-    
-    // Real-time data functions
-    function updateAirQualityData() {
-        const now = new Date();
-        const timeString = now.toLocaleTimeString('en-US', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-        });
-        
-        let districtKey = currentDistrict.toLowerCase();
-        const data = airQualityData[districtKey] || airQualityData['default'];
-        
+    return floodMock[district.toLowerCase()] || floodMock.default;
+}
+
+async function updateWeatherUI(city) {
+    const data = await fetchWeather(city);
+    if (data) {
+        document.getElementById('weather-temp').textContent = data.temp + '°C';
+        document.getElementById('weather-condition').textContent = data.condition;
+        document.getElementById('weather-humidity').textContent = data.humidity + '%';
+        document.getElementById('weather-wind').textContent = data.wind + ' km/h';
+        document.getElementById('weather-feels-like').textContent = data.feelsLike + '°C';
+        document.getElementById('weather-icon').className = `fas ${data.icon}`;
+    }
+    document.getElementById('weather-update-time').textContent = `Updated: ${new Date().toLocaleTimeString()}`;
+}
+
+async function updateAirQualityUI(city) {
+    const data = await fetchAirQuality(city);
+    if (data) {
         document.getElementById('air-quality-value').textContent = data.aqi;
         document.getElementById('air-quality-desc').textContent = data.level;
-        document.getElementById('air-quality-pm25').textContent = `${data.pm25} μg/m³`;
-        document.getElementById('air-quality-location').textContent = currentDistrict;
-        document.getElementById('air-quality-time').textContent = timeString;
-        
-        const aqiPosition = Math.min((data.aqi / 500) * 100, 100);
-        document.getElementById('aqi-marker').style.left = `${aqiPosition}%`;
-        
-        let statusColor = '';
-        if (data.aqi <= 50) statusColor = 'var(--aqi-good)';
-        else if (data.aqi <= 100) statusColor = 'var(--aqi-moderate)';
-        else if (data.aqi <= 150) statusColor = 'var(--aqi-sensitive)';
-        else if (data.aqi <= 200) statusColor = 'var(--aqi-unhealthy)';
-        else if (data.aqi <= 300) statusColor = 'var(--aqi-very-unhealthy)';
-        else statusColor = 'var(--aqi-hazardous)';
-        
-        document.getElementById('aqi-marker').style.borderColor = statusColor;
+        document.getElementById('air-quality-pm25').textContent = data.pm25 + ' μg/m³';
+        document.getElementById('air-quality-location').textContent = city;
+        const pos = Math.min((data.aqi / 500) * 100, 100);
+        document.getElementById('aqi-marker').style.left = pos + '%';
+    } else {
+        let fallbackAQI = 85;
+        const lower = city.toLowerCase();
+        if (['kathmandu','bhaktapur','lalitpur'].includes(lower)) fallbackAQI = 95;
+        else if (['biratnagar','nepalgunj','jhapa'].includes(lower)) fallbackAQI = 110;
+        else if (['pokhara','kaski'].includes(lower)) fallbackAQI = 45;
+        document.getElementById('air-quality-value').textContent = fallbackAQI;
+        document.getElementById('air-quality-desc').textContent = getAQILevel(fallbackAQI);
+        document.getElementById('air-quality-pm25').textContent = Math.round(fallbackAQI*0.5) + ' μg/m³';
+        document.getElementById('air-quality-location').textContent = city;
+        const pos = Math.min((fallbackAQI / 500) * 100, 100);
+        document.getElementById('aqi-marker').style.left = pos + '%';
     }
-    
-    function updateFloodAlertData() {
-        const now = new Date();
-        const timeString = now.toLocaleTimeString('en-US', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-        });
-        
-        let districtKey = currentDistrict.toLowerCase();
-        const data = floodData[districtKey] || floodData['default'];
-        
-        const percentage = (data.level / data.danger) * 100;
-        
+    document.getElementById('air-quality-time').textContent = new Date().toLocaleTimeString();
+}
+
+async function updateFloodUI(city) {
+    const data = await fetchFlood(city);
+    if (data) {
         document.getElementById('flood-level-value').textContent = data.level.toFixed(1);
         document.getElementById('flood-alert-desc').textContent = data.status;
         document.getElementById('flood-river').textContent = data.river;
-        document.getElementById('flood-danger-level').textContent = `${data.danger} m`;
-        document.getElementById('flood-alert-time').textContent = timeString;
-        
-        const markerPosition = Math.min(percentage, 100);
-        document.getElementById('flood-marker').style.left = `${markerPosition}%`;
-        
-        let statusColor = '';
-        if (percentage < 50) statusColor = 'var(--accent-green)';
-        else if (percentage < 75) statusColor = 'var(--accent-blue)';
-        else if (percentage < 100) statusColor = 'var(--accent-orange)';
-        else statusColor = 'var(--accent-red)';
-        
-        document.getElementById('flood-marker').style.borderColor = statusColor;
+        document.getElementById('flood-danger-level').textContent = data.danger + ' m';
+        const percent = (data.level / data.danger) * 100;
+        document.getElementById('flood-marker').style.left = Math.min(percent, 100) + '%';
     }
-    
-    function updateWeatherData() {
-        const now = new Date();
-        const timeString = now.toLocaleTimeString('en-US', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-        });
-        
-        let districtKey = currentDistrict.toLowerCase();
-        const data = weatherData[districtKey] || weatherData['default'];
-        
-        document.getElementById('weather-location-name').textContent = currentDistrict;
-        document.getElementById('weather-update-time').textContent = `Updated: ${timeString}`;
-        document.getElementById('weather-temp').textContent = `${data.temp}°C`;
-        document.getElementById('weather-condition').textContent = data.condition;
-        document.getElementById('weather-humidity').textContent = `${data.humidity}%`;
-        document.getElementById('weather-wind').textContent = `${data.wind} km/h`;
-        document.getElementById('weather-feels-like').textContent = `${data.feelsLike}°C`;
-        document.getElementById('weather-icon').className = `fas ${data.icon}`;
-    }
-    
-    // Update weather for specific location (for map clicks)
-    function updateWeatherForLocation(locationName) {
-        const now = new Date();
-        const timeString = now.toLocaleTimeString('en-US', { 
-            hour: '2-digit', 
-            minute: '2-digit' 
-        });
-        
-        let districtKey = locationName.toLowerCase();
-        const data = weatherData[districtKey] || weatherData['default'];
-        
-        document.getElementById('weather-location-name').textContent = locationName;
-        document.getElementById('weather-update-time').textContent = `Updated: ${timeString}`;
-        document.getElementById('weather-temp').textContent = `${data.temp}°C`;
-        document.getElementById('weather-condition').textContent = data.condition;
-        document.getElementById('weather-humidity').textContent = `${data.humidity}%`;
-        document.getElementById('weather-wind').textContent = `${data.wind} km/h`;
-        document.getElementById('weather-feels-like').textContent = `${data.feelsLike}°C`;
-        document.getElementById('weather-icon').className = `fas ${data.icon}`;
-    }
-    
-    // Generate alert cards based on current district
-    function generateAlertCards() {
-        const container = document.getElementById('alert-cards-container');
-        container.innerHTML = '';
-        
-        const alertTypes = ['earthquake', 'flood', 'landslide'];
-        const districtKey = currentDistrict.toLowerCase();
-        const risks = districtRiskData[districtKey] || districtRiskData['default'];
-        
-        alertTypes.forEach(type => {
-            const riskLevel = risks[type] || 'medium';
-            const riskClass = `${riskLevel}-risk`;
-            const alertData = preparednessData[type][riskLevel];
-            const icons = {
-                'earthquake': 'fas fa-bolt',
-                'flood': 'fas fa-water',
-                'landslide': 'fas fa-layer-group'
-            };
-            
-            const card = document.createElement('div');
-            card.className = `alert-card ${riskClass}`;
-            card.dataset.type = type;
-            card.dataset.risk = riskLevel;
-            
-            card.innerHTML = `
-                <div class="alert-header">
-                    <div class="alert-icon">
-                        <i class="${icons[type]}"></i>
-                    </div>
-                    <span class="alert-badge">${riskLevel.toUpperCase()} RISK</span>
-                </div>
-                <h3 class="alert-title">${type.charAt(0).toUpperCase() + type.slice(1)} Alert</h3>
-                <p class="alert-description">${alertData.alertTitle}</p>
-                <div class="alert-actions">
-                    <span class="alert-click-hint">
-                        <i class="fas fa-hand-pointer"></i>
-                        Click for preparedness details
-                    </span>
-                    <span style="font-size: 12px; color: var(--text-secondary);">
-                        <i class="far fa-clock"></i> Updated: ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                    </span>
-                </div>
-            `;
-            
-            card.addEventListener('click', function() {
-                showAlertDetails(alertData);
-            });
-            
-            container.appendChild(card);
-        });
-    }
-    
-    // District selection
-    const districtSelect = document.getElementById('district-select');
-    const getLocationBtn = document.getElementById('get-location-btn');
-    const locationStatus = document.getElementById('location-status');
-    const getMyLocationBtn = document.getElementById('get-my-location-btn');
-    const showOtherBtn = document.getElementById('show-other-btn');
-    
-    // All 77 districts of Nepal
-    const allDistricts = {
-        "Province 1": ["Bhojpur", "Dhankuta", "Ilam", "Jhapa", "Khotang", "Morang", "Okhaldhunga", "Panchthar", "Sankhuwasabha", "Solukhumbu", "Sunsari", "Taplejung", "Terhathum", "Udayapur"],
-        "Province 2": ["Saptari", "Siraha", "Dhanusha", "Mahottari", "Sarlahi", "Rautahat", "Bara", "Parsa"],
-        "Bagmati": ["Dolakha", "Ramechhap", "Sindhuli", "Kathmandu", "Bhaktapur", "Lalitpur", "Kavrepalanchok", "Nuwakot", "Rasuwa", "Dhading", "Makwanpur", "Chitwan"],
-        "Gandaki": ["Gorkha", "Lamjung", "Tanahun", "Syangja", "Kaski", "Manang", "Mustang", "Myagdi", "Parbat", "Baglung", "Nawalpur"],
-        "Lumbini": ["Rupandehi", "Kapilvastu", "Arghakhanchi", "Gulmi", "Palpa", "Nawalparasi West", "Nawalparasi East", "Dang", "Pyuthan", "Rolpa", "Eastern Rukum", "Banke", "Bardiya"],
-        "Karnali": ["Western Rukum", "Salyan", "Dolpa", "Mugu", "Humla", "Jumla", "Kalikot", "Dailekh", "Jajarkot", "Surkhet"],
-        "Sudurpashchim": ["Kailali", "Kanchanpur", "Dadeldhura", "Baitadi", "Darchula", "Bajhang", "Bajura", "Doti", "Achham"]
-    };
-    
-    // Populate district select
-    function populateAllDistricts() {
-        districtSelect.innerHTML = '<option value="">-- Select Your District --</option>';
-        
-        for (const province in allDistricts) {
-            const optgroup = document.createElement('optgroup');
-            optgroup.label = province;
-            
-            allDistricts[province].forEach(district => {
-                const option = document.createElement('option');
-                option.value = district;
-                option.textContent = district;
-                if (district === 'Kathmandu') option.selected = true;
-                optgroup.appendChild(option);
-            });
-            
-            districtSelect.appendChild(optgroup);
-        }
-    }
-    
-    // Initialize with all districts
-    populateAllDistricts();
-    
-    // Update alerts function
-    function updateAlerts(districtName) {
-        currentDistrict = districtName;
-        
-        // Update location status
-        locationStatus.innerHTML = `<i class="fas fa-map-marker-alt" style="color: var(--accent-green);"></i> Alerts for: ${districtName} District`;
-        
-        // Update all data
-        updateAirQualityData();
-        updateFloodAlertData();
-        updateWeatherData();
-        generateAlertCards();
-        
-        // Show success message
-        const originalText = getLocationBtn.innerHTML;
-        getLocationBtn.innerHTML = '<i class="fas fa-check"></i> Alerts Updated!';
-        getLocationBtn.style.background = 'var(--accent-green)';
-        
-        setTimeout(() => {
-            getLocationBtn.innerHTML = '<i class="fas fa-bell"></i> Get Alerts';
-            getLocationBtn.style.background = '';
-        }, 2000);
-    }
-    
-    // Get alerts button handler
-    getLocationBtn.addEventListener('click', function() {
-        const selectedDistrict = districtSelect.value;
-        
-        if (!selectedDistrict) {
-            locationStatus.innerHTML = '<i class="fas fa-exclamation-triangle" style="color: var(--accent-orange);"></i> Please select a district first';
-            return;
-        }
-        
-        updateAlerts(selectedDistrict);
+    document.getElementById('flood-alert-time').textContent = new Date().toLocaleTimeString();
+}
+
+function generateAlertCards() {
+    const container = document.getElementById('alert-cards-container');
+    container.innerHTML = '';
+    const districtKey = currentDistrict.toLowerCase();
+    const risks = districtRiskData[districtKey] || districtRiskData.default;
+    const types = ['earthquake', 'flood', 'landslide'];
+    const icons = { earthquake: 'fas fa-bolt', flood: 'fas fa-water', landslide: 'fas fa-layer-group' };
+    types.forEach(type => {
+        const level = risks[type] || 'medium';
+        const cls = level + '-risk';
+        const alertData = preparednessData[type][level];
+        const card = document.createElement('div');
+        card.className = `alert-card ${cls}`;
+        card.innerHTML = `
+            <div class="alert-header"><div class="alert-icon"><i class="${icons[type]}"></i></div><span class="alert-badge">${level.toUpperCase()} RISK</span></div>
+            <h3 class="alert-title">${type.charAt(0).toUpperCase() + type.slice(1)} Alert</h3>
+            <p class="alert-description">${alertData.alertTitle}</p>
+            <div class="alert-actions">
+                <span class="alert-click-hint"><i class="fas fa-hand-pointer"></i> Click for details</span>
+                <span><i class="far fa-clock"></i> ${new Date().toLocaleTimeString()}</span>
+            </div>
+        `;
+        card.addEventListener('click', () => showAlertDetails(alertData));
+        container.appendChild(card);
     });
-    
-    // Get user's location
-    getMyLocationBtn.addEventListener('click', function() {
-        const originalText = getMyLocationBtn.innerHTML;
-        getMyLocationBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Detecting...';
-        
-        setTimeout(() => {
-            // Simulate location detection
-            districtSelect.value = 'Kathmandu';
-            updateAlerts('Kathmandu');
-            
-            getMyLocationBtn.innerHTML = originalText;
-            
-            // Show message
-            const modal = document.createElement('div');
-            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.5); z-index: 1000; display: flex; justify-content: center; align-items: center;';
-            modal.innerHTML = `
-                <div style="background: var(--card-bg); border-radius: 20px; padding: 30px; max-width: 400px; width: 90%; border: 1px solid var(--border-color); text-align: center;">
-                    <h3 style="color: var(--accent-brown); margin-bottom: 15px;"><i class="fas fa-check-circle" style="color: var(--accent-green);"></i> Location Detected</h3>
-                    <p style="color: var(--text-secondary); margin-bottom: 20px;">Your location has been detected as <strong>Kathmandu</strong>. Alerts have been updated.</p>
-                    <button id="close-modal" style="background: var(--accent-brown); color: white; border: none; border-radius: 10px; padding: 12px 24px; font-weight: 600; cursor: pointer;">
-                        OK
-                    </button>
-                </div>
-            `;
-            
-            document.body.appendChild(modal);
-            
-            modal.querySelector('#close-modal').addEventListener('click', () => {
-                document.body.removeChild(modal);
-            });
-            
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    document.body.removeChild(modal);
-                }
-            });
-        }, 1500);
+}
+
+function showAlertDetails(data) {
+    document.getElementById('modal-title').textContent = data.title;
+    document.getElementById('modal-icon').className = data.icon;
+    document.getElementById('modal-alert-title').textContent = data.alertTitle;
+    document.getElementById('modal-description').textContent = data.description;
+    document.getElementById('modal-note').textContent = data.note;
+    const riskEl = document.getElementById('modal-risk-level');
+    riskEl.textContent = data.riskLevel;
+    riskEl.style.background = data.riskColor;
+    riskEl.style.color = 'white';
+    const list = document.getElementById('preparedness-list');
+    list.innerHTML = '';
+    data.preparedness.forEach(item => {
+        const li = document.createElement('li');
+        li.innerHTML = `<i class="fas fa-check-circle"></i> ${item}`;
+        list.appendChild(li);
     });
-    
-    // Initialize with default data
-    updateAirQualityData();
-    updateFloodAlertData();
-    updateWeatherData();
+    document.getElementById('alert-modal').style.display = 'flex';
+}
+
+function populateDistrictSelect() {
+    const select = document.getElementById('district-select');
+    select.innerHTML = '<option value="" id="select-district">-- Select Your District --</option>';
+    const demoDistricts = ['Kathmandu', 'Bhaktapur', 'Lalitpur', 'Pokhara', 'Biratnagar'];
+    demoDistricts.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d;
+        opt.textContent = d;
+        if (d === 'Kathmandu') opt.selected = true;
+        select.appendChild(opt);
+    });
+}
+populateDistrictSelect();
+
+document.getElementById('get-location-btn').addEventListener('click', () => {
+    const selected = document.getElementById('district-select').value;
+    if (!selected) {
+        document.getElementById('location-status').innerHTML = '<i class="fas fa-exclamation-triangle"></i> Please select a district';
+        return;
+    }
+    currentDistrict = selected;
+    document.getElementById('location-status').innerHTML = `<i class="fas fa-map-marker-alt"></i> Alerts for: ${selected}`;
+    updateWeatherUI(selected);
+    updateAirQualityUI(selected);
+    updateFloodUI(selected);
     generateAlertCards();
-    
-    // Map initialization
-    let map;
-    let riskLayers = {};
-    
-    function initializeMap() {
-        // Initialize map centered on Nepal
-        map = L.map('interactive-map').setView([28.3949, 84.1240], 7);
-        
-        // Add tile layer
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors',
-            maxZoom: 10,
-            minZoom: 6
-        }).addTo(map);
-        
-        // Add search control
-        L.Control.geocoder({
-            defaultMarkGeocode: false
-        }).on('markgeocode', function(e) {
-            var bbox = e.geocode.bbox;
-            map.fitBounds(bbox);
-        }).addTo(map);
-        
-        // Define risk zones with click functionality
-        const riskZones = [
-            { name: 'Kathmandu', latlng: [27.7172, 85.3240], risks: ['earthquake'], level: 'high' },
-            { name: 'Pokhara', latlng: [28.2096, 83.9856], risks: ['landslide'], level: 'high' },
-            { name: 'Sindhupalchok', latlng: [27.9167, 85.5833], risks: ['earthquake', 'landslide'], level: 'high' },
-            { name: 'Saptari', latlng: [26.5833, 86.8333], risks: ['flood'], level: 'high' },
-            { name: 'Gorkha', latlng: [28.3333, 84.9167], risks: ['earthquake'], level: 'high' },
-            { name: 'Biratnagar', latlng: [26.4833, 87.2833], risks: ['flood'], level: 'high' },
-            { name: 'Nepalgunj', latlng: [28.0500, 81.6167], risks: ['flood'], level: 'medium' },
-            { name: 'Kaski', latlng: [28.2096, 83.9856], risks: ['landslide'], level: 'high' },
-            { name: 'Jhapa', latlng: [26.5833, 87.9167], risks: ['flood'], level: 'high' },
-            { name: 'Chitwan', latlng: [27.5833, 84.5000], risks: ['flood', 'earthquake'], level: 'medium' }
-        ];
-        
-        // Create layer groups
-        riskLayers.earthquake = L.layerGroup();
-        riskLayers.flood = L.layerGroup();
-        riskLayers.landslide = L.layerGroup();
-        riskLayers.all = L.layerGroup();
-        
-        // Add markers for each risk zone
-        riskZones.forEach(zone => {
-            let color;
-            switch(zone.level) {
-                case 'high': color = '#ef4444'; break;
-                case 'medium': color = '#f59e0b'; break;
-                case 'low': color = '#10b981'; break;
-                default: color = '#6b7280';
-            }
-            
-            // Create custom icon
-            const icon = L.divIcon({
-                className: 'custom-marker',
-                html: `<div style="
-                    background: ${color};
-                    width: 24px;
-                    height: 24px;
-                    border-radius: 50%;
-                    border: 3px solid white;
-                    box-shadow: 0 0 10px rgba(0,0,0,0.3);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    color: white;
-                    font-size: 12px;
-                    cursor: pointer;
-                ">
-                    ${zone.risks.includes('earthquake') ? '⛰️' : 
-                      zone.risks.includes('flood') ? '🌊' : '⛰️'}
-                </div>`,
-                iconSize: [30, 30],
-                iconAnchor: [15, 15]
-            });
-            
-            const marker = L.marker(zone.latlng, { icon: icon })
-                .bindPopup(`
-                    <div style="min-width: 200px;">
-                        <h4 style="margin: 0 0 8px 0; color: var(--accent-brown);">${zone.name}</h4>
-                        <p style="margin: 4px 0; font-size: 12px;">
-                            <strong>Risk Level:</strong> 
-                            <span style="color: ${color}; font-weight: bold;">${zone.level.toUpperCase()}</span>
-                        </p>
-                        <p style="margin: 4px 0; font-size: 12px;">
-                            <strong>Primary Risks:</strong> ${zone.risks.join(', ')}
-                        </p>
-                        <button onclick="updateWeatherFromMap('${zone.name}')" 
-                                style="width: 100%; margin-top: 8px; padding: 6px; background: var(--accent-brown); color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
-                            <i class="fas fa-cloud-sun"></i> View Weather
-                        </button>
-                    </div>
-                `);
-            
-            // Add click handler to update district info
-            marker.on('click', function() {
-                const districtInfo = document.getElementById('district-info');
-                const districtName = document.getElementById('district-name');
-                const districtDescription = document.getElementById('district-description');
-                const districtRisks = document.getElementById('district-risks');
-                const districtTips = document.getElementById('district-tips');
-                
-                districtName.textContent = zone.name;
-                districtDescription.textContent = `Located in Nepal with ${zone.level} risk level`;
-                
-                // Update weather widget
-                updateWeatherForLocation(zone.name);
-                
-                // Clear and add risk tags
-                districtRisks.innerHTML = '';
-                zone.risks.forEach(risk => {
-                    const tag = document.createElement('span');
-                    tag.className = `risk-tag ${risk}`;
-                    tag.style.cssText = 'display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-right: 6px; margin-bottom: 6px;';
-                    if (risk === 'earthquake') {
-                        tag.style.background = 'rgba(197, 48, 48, 0.2)';
-                        tag.style.color = 'var(--accent-red)';
-                    } else if (risk === 'flood') {
-                        tag.style.background = 'rgba(56, 161, 105, 0.2)';
-                        tag.style.color = 'var(--accent-green)';
-                    } else {
-                        tag.style.background = 'rgba(210, 105, 30, 0.2)';
-                        tag.style.color = 'var(--accent-orange)';
-                    }
-                    tag.textContent = risk.charAt(0).toUpperCase() + risk.slice(1);
-                    districtRisks.appendChild(tag);
-                });
-                
-                // Add tips
-                let tips = '';
-                if (zone.risks.includes('earthquake')) {
-                    tips += '• Secure heavy furniture and know evacuation routes. ';
-                }
-                if (zone.risks.includes('flood')) {
-                    tips += '• Prepare emergency supplies and evacuation plan. ';
-                }
-                if (zone.risks.includes('landslide')) {
-                    tips += '• Avoid hillside areas during heavy rain. ';
-                }
-                districtTips.textContent = tips || 'Regular emergency preparedness recommended.';
-                
-                districtInfo.style.display = 'block';
-            });
-            
-            // Add to appropriate layers
-            if (zone.risks.includes('earthquake')) riskLayers.earthquake.addLayer(marker);
-            if (zone.risks.includes('flood')) riskLayers.flood.addLayer(marker);
-            if (zone.risks.includes('landslide')) riskLayers.landslide.addLayer(marker);
-            riskLayers.all.addLayer(marker);
-        });
-        
-        // Add all layers by default
-        riskLayers.all.addTo(map);
-        
-        // Add click handler to map to close district info
-        map.on('click', function() {
-            document.getElementById('district-info').style.display = 'none';
-        });
-        
-        // Layer control buttons
-        document.querySelectorAll('.map-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const layer = this.getAttribute('data-layer');
-                
-                // Update button states
-                document.querySelectorAll('.map-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                
-                // Remove all layers
-                Object.values(riskLayers).forEach(layerGroup => {
-                    if (map.hasLayer(layerGroup)) {
-                        map.removeLayer(layerGroup);
-                    }
-                });
-                
-                // Add selected layer
-                if (layer === 'all') {
-                    riskLayers.all.addTo(map);
-                } else {
-                    riskLayers[layer].addTo(map);
-                }
-            });
-        });
-        
-        // Make function available globally for popup button
-        window.updateWeatherFromMap = function(locationName) {
-            updateWeatherForLocation(locationName);
-        };
-    }
-    
-    // Auto-refresh every 5 minutes
-    setInterval(() => {
-        updateAirQualityData();
-        updateFloodAlertData();
-        updateWeatherData();
-    }, 300000);
-    
-    // Initialize with home tab active
-    switchTab('home');
 });
+
+document.getElementById('get-my-location-btn').addEventListener('click', () => {
+    document.getElementById('district-select').value = 'Kathmandu';
+    currentDistrict = 'Kathmandu';
+    document.getElementById('location-status').innerHTML = '<i class="fas fa-map-marker-alt"></i> Alerts for: Kathmandu';
+    updateWeatherUI('Kathmandu');
+    updateAirQualityUI('Kathmandu');
+    updateFloodUI('Kathmandu');
+    generateAlertCards();
+});
+
+document.getElementById('refresh-realtime-data').addEventListener('click', function() {
+    this.classList.add('updating');
+    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Updating...';
+    updateWeatherUI(currentDistrict);
+    updateAirQualityUI(currentDistrict);
+    updateFloodUI(currentDistrict);
+    setTimeout(() => {
+        this.classList.remove('updating');
+        this.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+    }, 1500);
+});
+
+document.getElementById('modal-close').addEventListener('click', () => {
+    document.getElementById('alert-modal').style.display = 'none';
+});
+document.getElementById('alert-modal').addEventListener('click', (e) => {
+    if (e.target === document.getElementById('alert-modal')) {
+        document.getElementById('alert-modal').style.display = 'none';
+    }
+});
+
+// ========== CHATBOT ==========
+const chatbotIcon = document.getElementById('chatbot-icon');
+const chatbotWindow = document.getElementById('chatbot-window');
+const chatbotClose = document.getElementById('chatbot-close');
+const chatbotMessages = document.getElementById('chatbot-messages');
+const chatbotInput = document.getElementById('chatbot-input');
+const chatbotSend = document.getElementById('chatbot-send');
+
+chatbotIcon.addEventListener('click', () => {
+    chatbotWindow.style.display = 'flex';
+    chatbotIcon.style.display = 'none';
+});
+chatbotClose.addEventListener('click', () => {
+    chatbotWindow.style.display = 'none';
+    chatbotIcon.style.display = 'flex';
+});
+
+function addMessage(text, sender) {
+    const div = document.createElement('div');
+    div.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
+    div.textContent = text;
+    chatbotMessages.appendChild(div);
+    chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+}
+
+function extractDistrict(text) {
+    const match = text.match(/in (\w+)/i);
+    if (match) return match[1];
+    return null;
+}
+
+async function processUserInput(input) {
+    const lower = input.toLowerCase();
+
+    if (lower.includes('weather')) {
+        const district = extractDistrict(input) || currentDistrict;
+        const data = await fetchWeather(district);
+        if (data) addMessage(`Weather in ${district}: ${data.temp}°C, ${data.condition}, humidity ${data.humidity}%, wind ${data.wind} km/h.`, 'bot');
+        else addMessage(`Could not fetch weather for ${district}.`, 'bot');
+    } else if (lower.includes('air quality') || lower.includes('aqi')) {
+        const district = extractDistrict(input) || currentDistrict;
+        const data = await fetchAirQuality(district);
+        if (data) addMessage(`Air quality in ${district}: AQI ${data.aqi} (${data.level}), PM2.5: ${data.pm25} µg/m³.`, 'bot');
+        else addMessage(`Live air quality data for ${district} is not available.`, 'bot');
+    } else if (lower.includes('earthquake')) {
+        const quakes = await fetchEarthquakes();
+        if (quakes.length > 0) {
+            const recent = quakes.slice(0, 3).map(q => `${q.mag} mag at ${q.place}`).join('; ');
+            addMessage(`Recent earthquakes in Nepal: ${recent}`, 'bot');
+        } else {
+            addMessage('No recent earthquakes detected in Nepal.', 'bot');
+        }
+    } else if (lower.includes('flood')) {
+        const district = extractDistrict(input) || currentDistrict;
+        const data = await fetchFlood(district);
+        addMessage(`Flood status in ${district}: River ${data.river} at ${data.level}m (danger at ${data.danger}m). Status: ${data.status}.`, 'bot');
+    } else {
+        addMessage("I'm not sure about that. Try asking about weather, air quality, floods, or earthquakes.", 'bot');
+    }
+}
+
+chatbotSend.addEventListener('click', () => {
+    const text = chatbotInput.value.trim();
+    if (!text) return;
+    addMessage(text, 'user');
+    chatbotInput.value = '';
+    processUserInput(text);
+});
+chatbotInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') chatbotSend.click();
+});
+
+// ========== TAB SWITCHING ==========
+function switchTab(tabId) {
+    document.querySelectorAll('.floating-nav button').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-tab') === tabId);
+    });
+    document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.toggle('active', content.id === tabId);
+    });
+    if (tabId === 'mapping' && !map) setTimeout(initMap, 100);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.querySelectorAll('.floating-nav button').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        switchTab(btn.getAttribute('data-tab'));
+    });
+});
+document.querySelector('.discover-btn').addEventListener('click', (e) => {
+    e.preventDefault();
+    switchTab('mapping');
+});
+
+// ========== MAP ==========
+function initMap() {
+    map = L.map('interactive-map').setView([28.3949, 84.1240], 7);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 10, minZoom: 6 }).addTo(map);
+    const marker = L.marker([27.7172, 85.3240]).addTo(map)
+        .bindPopup('<b>Kathmandu</b><br>Click for weather')
+        .on('click', () => updateWeatherUI('Kathmandu'));
+}
+
+// ========== INITIAL LOAD ==========
+updateWeatherUI('Kathmandu');
+updateAirQualityUI('Kathmandu');
+updateFloodUI('Kathmandu');
+generateAlertCards();
