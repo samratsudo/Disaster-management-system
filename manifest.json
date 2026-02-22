@@ -1,7 +1,7 @@
 {
   "name": "HazardGuard Nepal",
   "short_name": "HazardGuard",
-  "description": "Disaster awareness and preparedness platform for Nepal with real-time alerts and AI chatbot.",
+  "description": "Disaster awareness and preparedness for Nepal",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f8f5f0",
